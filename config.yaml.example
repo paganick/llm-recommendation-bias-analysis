@@ -1,0 +1,75 @@
+# LLM Recommendation Bias Analysis Configuration
+
+# LLM API Configuration
+llm:
+  # Recommender LLM (the one being tested for bias)
+  recommender:
+    provider: "anthropic"  # anthropic, openai
+    model: "claude-3-5-sonnet-20241022"
+    api_key: "YOUR_API_KEY_HERE"
+    temperature: 0.7
+    max_tokens: 2000
+
+  # Analysis LLMs (for metadata inference)
+  sentiment_analyzer:
+    provider: "anthropic"
+    model: "claude-3-haiku-20240307"
+    api_key: "YOUR_API_KEY_HERE"
+    temperature: 0.0
+
+  topic_classifier:
+    provider: "anthropic"
+    model: "claude-3-haiku-20240307"
+    api_key: "YOUR_API_KEY_HERE"
+    temperature: 0.0
+
+# Dataset Configuration
+datasets:
+  twitteraae:
+    path: "/data/nicpag/AI_recsys_project/TwitterAAE-full-v1.zip"
+    version: "limited_aa"  # limited, limited_aa, all, all_aa
+    sample_size: null  # null for all data, or specify number
+
+  dadit:
+    path: "/data/nicpag/AI_recsys_project/DADIT_data_for_publishing.zip"
+    version: "test_anon"
+    sample_size: null
+
+# Experiment Configuration
+experiment:
+  # Number of tweets to use in each recommendation batch
+  pool_size: 50
+
+  # Number of recommendations to request from LLM
+  top_k: 10
+
+  # Number of trials/runs
+  num_trials: 100
+
+  # Random seed for reproducibility
+  random_seed: 42
+
+# Bias Analysis Configuration
+bias_analysis:
+  # Which dimensions to analyze
+  dimensions:
+    - demographic  # race/ethnicity
+    - sentiment
+    - writing_style  # polished vs. casual
+    - emoji_usage
+    - author_popularity  # follower count
+    - topic
+    - political_leaning
+
+  # Statistical significance level
+  alpha: 0.05
+
+  # Minimum effect size to report
+  min_effect_size: 0.1
+
+# Output Configuration
+output:
+  base_dir: "./outputs"
+  save_intermediate: true
+  generate_plots: true
+  format: "parquet"  # parquet, csv
