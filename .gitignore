@@ -24,6 +24,7 @@ wheels/
 venv/
 env/
 ENV/
+recsys_env/
 
 # IDE
 .vscode/
@@ -32,34 +33,43 @@ ENV/
 *.swo
 *~
 
-# Project specific
-outputs/
-experiments/**/outputs/
-*.html
-*.png
-*.pdf
-.DS_Store
-
-# Data (don't commit large datasets)
-data/raw/
-data/processed/
-*.parquet
-*.zip
-*.csv
-
-# Configuration (may contain API keys)
-config.yaml
-.env
-
-# Logs
-*.log
-logs/
-
-# Jupyter
-.ipynb_checkpoints/
+# Jupyter Notebook
+.ipynb_checkpoints
 *.ipynb
 
-# Test outputs
-test_*/
-*_output/
-*_results/
+# Environment variables
+.env
+.env.local
+
+# API Keys (IMPORTANT!)
+*.key
+*_api_key*
+credentials.json
+
+# Data files (too large for git)
+data/*.zip
+data/*.csv
+data/*.parquet
+*.zip
+TwitterAAE-full-v1/
+DADIT_data_for_publishing/
+
+# Outputs
+outputs/
+logs/
+*.log
+/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Experiments
+experiments/
+*.pkl
+*.pickle
+
+# Cache
+.cache/
+*.cache
+metadata_cache.csv

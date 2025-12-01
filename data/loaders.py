@@ -63,7 +63,8 @@ class TwitterAAELoader:
                 # Determine columns based on version
                 if 'all' in version:
                     # Full version with text
-                    columns = ['tweet_id', 'timestamp', 'user_id', 'lon', 'lat',
+                    # Note: lon/lat are stored as a single column [lon, lat]
+                    columns = ['tweet_id', 'timestamp', 'user_id', 'lon_lat',
                              'blockgroup', 'text', 'demo_aa', 'demo_hispanic',
                              'demo_other', 'demo_white']
                 else:

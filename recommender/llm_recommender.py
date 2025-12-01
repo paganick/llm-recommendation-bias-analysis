@@ -114,9 +114,15 @@ class OneShotRecommender:
         # Add tweets
         for idx, (i, row) in enumerate(tweets_df.iterrows(), 1):
             text = row['text'] if 'text' in row else str(row.get('tweet_id', ''))
+            # Convert to string if needed
+            if not isinstance(text, str):
+                text = str(text) if text is not None else f"[Tweet {idx}]"
+            text = text.strip()
             # Truncate long tweets
             if len(text) > 200:
                 text = text[:200] + "..."
+            if not text:  # If empty after stripping
+                text = f"[Empty tweet {idx}]"
             prompt_parts.append(f"{idx}. {text}")
 
         # Task instruction

@@ -49,17 +49,43 @@ experiment:
   # Random seed for reproducibility
   random_seed: 42
 
+# Metadata Inference Configuration
+inference:
+  # Sentiment analysis method
+  sentiment_method: "vader"  # textblob, vader, llm
+
+  # Topic classification method
+  topic_method: "keyword"  # keyword, lda, llm
+
+  # Enable/disable specific analyses
+  include_gender: true
+  include_political: true
+  include_style: true
+  include_polarization: true
+
+  # Batch processing
+  batch_size: 1000
+  verbose: true
+
 # Bias Analysis Configuration
 bias_analysis:
   # Which dimensions to analyze
   dimensions:
-    - demographic  # race/ethnicity
-    - sentiment
-    - writing_style  # polished vs. casual
-    - emoji_usage
-    - author_popularity  # follower count
-    - topic
-    - political_leaning
+    - demographic  # race/ethnicity (demo_aa, demo_white, etc.)
+    - sentiment    # positive/negative/neutral
+    - writing_style  # polished vs. casual, formality
+    - emoji_usage  # presence of emojis
+    - topic        # politics, sports, entertainment, etc.
+    - political_leaning  # left, right, center
+    - gender       # inferred gender of author
+    - polarization  # controversial/polarizing content
+
+  # Demographic columns to analyze
+  demographic_cols:
+    - "demo_aa"
+    - "demo_white"
+    - "demo_hispanic"
+    - "demo_other"
 
   # Statistical significance level
   alpha: 0.05
