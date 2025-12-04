@@ -1,327 +1,353 @@
 # LLM Recommendation Bias Analysis
 
-Analysis framework for evaluating bias in LLM-based recommendation systems using real-world social media data.
+Framework for analyzing bias in LLM-based recommendation systems across multiple social media platforms and models.
 
 ## Overview
 
-This project tests whether LLM recommender systems exhibit systematic biases when suggesting content. Unlike simulation-based approaches, this framework uses real-world tweets to perform one-shot recommendation analysis.
+This project evaluates whether LLM recommender systems exhibit systematic biases when suggesting content. It supports multiple datasets (Twitter, Reddit, Bluesky) and multiple LLM providers (OpenAI, Anthropic, HuggingFace local models).
 
-## Research Questions
+## Key Features
 
-Does the LLM recommender systematically favor:
-- Content from specific demographic groups (gender, race)?
-- Positive vs. negative sentiment?
-- Polished vs. casual writing styles?
-- Content with emojis?
-- Authors with higher follower counts?
-- Specific topics or political positions?
+- **Multiple Datasets**: Twitter, Reddit, Bluesky
+- **Multiple Models**: OpenAI GPT, Anthropic Claude, HuggingFace models (Llama, Mistral, etc.)
+- **Prompt Style Comparison**: Test how different prompt framings affect recommendations
+- **Comprehensive Bias Analysis**: Sentiment, topics, style, polarization
+- **Automated Metadata Inference**: Extract metadata from post text
 
 ## Project Structure
 
 ```
 llm-recommendation-bias-analysis/
-├── data/                  # Data loading and preprocessing
-├── inference/             # Metadata inference (sentiment, topics, demographics, etc.)
-├── recommender/           # LLM-based recommendation system
-├── analysis/              # Bias analysis and visualization
-├── utils/                 # Shared utilities (LLM clients, config)
-├── experiments/           # Experimental scenarios and results
-└── outputs/              # Generated outputs and reports
+├── data/                  # Data loading
+├── inference/             # Metadata inference (preprocessing)
+├── utils/                 # LLM clients
+├── analysis/              # Bias analysis (postprocessing)
+├── datasets/              # Local dataset copies (not committed)
+├── outputs/               # Experiment results
+├── run_experiment.py      # Main experiment runner
+├── analyze_experiment.py  # Results analysis
+└── test_pipeline.py       # Pipeline tests
 ```
 
-## Datasets
+## Quick Start
 
-### TwitterAAE (African American English Twitter Corpus)
-- 59M+ tweets with demographic inferences
-- Includes user IDs, timestamps, locations, full text
-- Demographic probabilities: AA, Hispanic, Other, White
-- Use case: Testing demographic bias in recommendations
-
-### DADIT
-- Mental health and user classification dataset
-- Parquet format with multiple train/test splits
-- Use case: TBD based on schema exploration
-
-## Setup
+### 1. Installation
 
 ```bash
+# Clone repository
+git clone <your-repo-url>
+cd llm-recommendation-bias-analysis
+
+# Install dependencies
 pip install -r requirements.txt
-cp config.yaml.example config.yaml
-# Edit config.yaml with your LLM API keys
+
+# For HuggingFace models (optional)
+pip install transformers torch accelerate
 ```
 
-## Usage
+### 2. Setup Datasets
 
-### Quick Start
+The framework expects datasets in `./datasets/{platform}/personas.pkl` format.
 
-1. **Set up your API key:**
+Copy your datasets:
 ```bash
-export ANTHROPIC_API_KEY='your-api-key-here'
-# or for OpenAI:
-# export OPENAI_API_KEY='your-api-key-here'
+mkdir -p datasets/twitter datasets/reddit datasets/bluesky
+# Copy your persona datasets to these directories
 ```
 
-2. **Run the complete analysis:**
-```bash
-python run_complete_analysis.py --provider anthropic --model claude-3-5-sonnet-20241022
-```
+Dataset format (pickle files with pandas DataFrame):
+- Required columns: `message`, `username` (or `user_id`), `persona`, `training`
+- `message`: Post text
+- `persona`: User demographic/persona information
+- `training`: Train/test split indicator (0 or 1)
 
-This will:
-- Load the TwitterAAE dataset
-- Infer metadata (sentiment, topics, gender, political leaning, etc.)
-- Get LLM recommendations
-- Analyze bias in recommendations
-- Generate visualizations
-
-### Running a Simple Example
-
-```python
-from data.loaders import load_dataset
-from utils.llm_client import get_llm_client
-from inference.metadata_inference import infer_tweet_metadata
-from recommender.llm_recommender import OneShotRecommender
-from analysis.bias_analysis import BiasAnalyzer
-
-# 1. Load data
-tweets_df = load_dataset('twitteraae', version='all_aa', sample_size=1000)
-
-# 2. Infer metadata
-tweets_df = infer_tweet_metadata(
-    tweets_df,
-    sentiment_method='vader',
-    include_gender=True,
-    include_political=True
-)
-
-# 3. Initialize LLM
-llm = get_llm_client(provider='anthropic', model='claude-3-5-sonnet-20241022')
-
-# 4. Get recommendations
-recommender = OneShotRecommender(llm, k=10)
-pool = tweets_df.sample(n=50)
-recommended = recommender.recommend(pool, prompt_style='popular')
-
-# 5. Analyze bias
-analyzer = BiasAnalyzer()
-results = analyzer.comprehensive_bias_analysis(
-    recommended, pool,
-    demographic_cols=['demo_aa', 'demo_white', 'demo_hispanic', 'demo_other']
-)
-
-print(results['summary'])
-```
-
-### Metadata Inference
-
-The framework can infer the following metadata from tweet text:
-
-#### Available Analyzers
-
-1. **Sentiment Analysis** (`SentimentAnalyzer`)
-   - Methods: `textblob`, `vader`, `llm`
-   - Output: polarity, subjectivity, sentiment label
-
-2. **Topic Classification** (`TopicClassifier`)
-   - Methods: `keyword`, `lda`, `llm`
-   - Topics: politics, sports, entertainment, technology, health, etc.
-
-3. **Gender Inference** (`GenderAnalyzer`) ⭐ NEW
-   - Methods: `keyword`, `llm`
-   - Output: male/female/unknown with confidence scores
-
-4. **Political Leaning** (`PoliticalLeaningAnalyzer`) ⭐ NEW
-   - Methods: `keyword`, `llm`
-   - Output: left/right/center/unknown with confidence scores
-
-5. **Style Analysis** (`StyleAnalyzer`)
-   - Detects: emojis, hashtags, mentions, URLs, formality
-
-6. **Polarization Analysis** (`PolarizationAnalyzer`)
-   - Measures controversial/polarizing content
-
-#### Using LLM-based Inference
-
-For more accurate inference, use LLM-based methods:
-
-```python
-from utils.llm_client import get_llm_client
-from inference.metadata_inference import MetadataInferenceEngine
-
-# Initialize LLM client
-llm = get_llm_client(provider='anthropic', model='claude-3-haiku-20240307')
-
-# Create inference engine with LLM methods
-engine = MetadataInferenceEngine(
-    sentiment_method='llm',
-    gender_method='llm',
-    political_method='llm',
-    llm_client=llm
-)
-
-# Infer metadata
-result = engine.infer("Your tweet text here")
-```
-
-### Running Experiments
-
-#### Single Experiment
+### 3. Test Pipeline
 
 ```bash
-python experiments/experiment_runner.py \
-    --dataset twitteraae \
-    --llm-provider anthropic \
-    --llm-model claude-3-5-sonnet-20241022 \
-    --prompt-style popular \
-    --pool-size 50 \
-    --k 10
+python test_pipeline.py
 ```
 
-#### Batch Experiments
+This verifies:
+- Dataset loading works
+- Metadata inference works
+- LLM clients initialize correctly
 
-```python
-from experiments.experiment_runner import ExperimentRunner, ExperimentConfig
+### 4. Run Experiment
 
-# Define experiment configurations
-configs = [
-    ExperimentConfig(
-        name='claude_popular',
-        llm_provider='anthropic',
-        llm_model='claude-3-5-sonnet-20241022',
-        prompt_style='popular',
-        pool_size=50,
-        k=10
-    ),
-    ExperimentConfig(
-        name='claude_controversial',
-        llm_provider='anthropic',
-        llm_model='claude-3-5-sonnet-20241022',
-        prompt_style='controversial',
-        pool_size=50,
-        k=10
-    ),
-]
+#### Using OpenAI:
+```bash
+export OPENAI_API_KEY='your-key-here'
 
-# Run experiments
-runner = ExperimentRunner(
-    dataset_name='twitteraae',
-    dataset_sample_size=5000,
-    output_dir='./experiments/results'
-)
-
-runner.load_data()
-results = runner.run_batch(configs)
-runner.generate_visualizations()
+python run_experiment.py \
+  --dataset twitter \
+  --provider openai \
+  --model gpt-4o-mini \
+  --dataset-size 5000 \
+  --pool-size 100 \
+  --k 10 \
+  --n-trials 20
 ```
 
-### Bias Analysis
+#### Using Anthropic Claude:
+```bash
+export ANTHROPIC_API_KEY='your-key-here'
 
-The framework analyzes bias across multiple dimensions:
+python run_experiment.py \
+  --dataset reddit \
+  --provider anthropic \
+  --model claude-3-5-sonnet-20241022 \
+  --dataset-size 5000 \
+  --pool-size 100 \
+  --k 10 \
+  --n-trials 20
+```
 
-- **Demographic Bias**: Over/under-representation of demographic groups
-- **Sentiment Bias**: Preference for positive/negative content
-- **Topic Bias**: Preference for specific topics
-- **Style Bias**: Preference for formal vs. casual language, emojis, etc.
-- **Polarization Bias**: Preference for controversial content
-- **Gender Bias**: Preference for content from specific genders ⭐ NEW
-- **Political Bias**: Preference for specific political leanings ⭐ NEW
+#### Using HuggingFace (Local Model):
+```bash
+python run_experiment.py \
+  --dataset bluesky \
+  --provider huggingface \
+  --model meta-llama/Llama-3.1-8B-Instruct \
+  --dataset-size 5000 \
+  --pool-size 100 \
+  --k 10 \
+  --n-trials 20
+```
 
-#### Bias Metrics
+Other HuggingFace models you can use:
+- `mistralai/Mistral-7B-Instruct-v0.2`
+- `meta-llama/Llama-3.2-3B-Instruct`
+- Any HuggingFace model with instruct/chat capability
 
-- Statistical tests (t-tests, chi-square)
-- Effect sizes (Cohen's d)
-- Significance levels (p-values)
-- Percentage point differences
+### 5. Analyze Results
 
-### Visualization
-
-Generate comprehensive bias reports:
-
-```python
-from analysis.visualization import create_bias_report
-
-create_bias_report(
-    bias_results,
-    output_dir='./outputs/visualizations',
-    system_name='Claude-Popular'
-)
+```bash
+python analyze_experiment.py \
+  --results-dir outputs/experiments/twitter_openai_gpt-4o-mini
 ```
 
 This generates:
-- Comprehensive dashboard with all bias metrics
-- Individual plots for each bias dimension
-- Demographic bias comparisons
-- Sentiment distribution plots
-- Topic bias rankings
-- Style and polarization visualizations
+- `summary_statistics.csv`: Aggregated bias metrics
+- `plots/`: Visualizations comparing prompt styles
+  - `sentiment_comparison.png`: Sentiment bias
+  - `sentiment-polarity-comparison.png`: Continuous sentiment scores
+  - `polarization-score-comparison.png`: Controversy bias
+  - `formality-score-comparison.png`: Formality bias
+  - `topic_comparison.png`: Topic preferences
 
-### Command-Line Options
+## Experiment Configuration
 
-The `run_complete_analysis.py` script supports many options:
+### Command-Line Arguments
 
 ```bash
-python run_complete_analysis.py --help
-
-Options:
-  --provider {anthropic,openai}
-                        LLM provider (default: anthropic)
-  --model MODEL         LLM model name (default: claude-3-5-sonnet-20241022)
-  --dataset {twitteraae,dadit}
-                        Dataset to use (default: twitteraae)
-  --dataset-version VERSION
-                        Dataset version (default: all_aa)
-  --dataset-size SIZE   Number of tweets to load (default: 5000)
-  --pool-size SIZE      Number of tweets in recommendation pool (default: 50)
-  --k K                 Number of recommendations (default: 10)
-  --prompt-style {general,popular,engaging,informative,controversial}
-                        Recommendation prompt style (default: popular)
-  --include-gender      Include gender inference (default: True)
-  --include-political   Include political leaning inference (default: True)
-  --output-dir DIR      Output directory (default: ./outputs/complete_analysis)
-  --metadata-cache PATH Path to metadata cache file
+python run_experiment.py --help
 ```
 
-### Advanced Usage
+Key parameters:
+- `--dataset`: Dataset to use (`twitter`, `reddit`, `bluesky`)
+- `--provider`: LLM provider (`openai`, `anthropic`, `huggingface`)
+- `--model`: Model name
+- `--dataset-size`: Total posts to load
+- `--pool-size`: Posts per recommendation pool
+- `--k`: Number of recommendations per trial
+- `--n-trials`: Trials per prompt style
+- `--styles`: Prompt styles to test (default: all)
 
-#### Custom Recommender Prompts
+### Prompt Styles
 
-```python
-from recommender.llm_recommender import OneShotRecommender
+The framework tests 6 different prompt styles:
+1. **general**: Neutral, interesting to general audience
+2. **popular**: Most popular/viral content
+3. **engaging**: Maximum engagement (likes, shares)
+4. **informative**: Educational/informative content
+5. **controversial**: Thought-provoking/debate-generating
+6. **neutral**: Simple ranking (baseline)
 
-recommender = OneShotRecommender(llm, k=10)
+## Metadata Inference (Preprocessing)
 
-# Use different prompt styles
-recommended = recommender.recommend(pool, prompt_style='controversial')
+The framework automatically infers metadata from post text:
+
+- **Sentiment**: Polarity, subjectivity, label (positive/negative/neutral)
+- **Topics**: Politics, sports, entertainment, technology, health, etc.
+- **Style**: Formality, emoji usage, hashtags, mentions
+- **Polarization**: Controversial/polarizing content detection
+
+Method: VADER sentiment analysis + keyword-based topic classification
+
+Cached automatically to `outputs/metadata_cache/` for faster re-runs.
+
+## Bias Analysis (Postprocessing)
+
+For each prompt style, the framework compares:
+- **Pool distribution**: Content available to LLM
+- **Recommended distribution**: Content selected by LLM
+- **Differences**: Over/under-representation (percentage points)
+
+Analyzed dimensions:
+- Sentiment (positive vs. negative)
+- Topics (politics, sports, entertainment, etc.)
+- Formality (formal vs. casual)
+- Polarization (controversial vs. neutral)
+- Emoji usage
+
+## Project Workflow
+
+```
+1. Load Dataset
+   ↓
+2. Infer Metadata (cached)
+   ↓
+3. For each prompt style:
+   - Sample random pool of posts
+   - Get LLM recommendations
+   - Compare pool vs. recommendations
+   ↓
+4. Aggregate results across trials
+   ↓
+5. Generate visualizations
 ```
 
-Available prompt styles:
-- `general`: Interesting tweets for general audience
-- `popular`: Tweets likely to be popular/viral
-- `engaging`: Tweets that generate engagement
-- `informative`: Educational/informative tweets
-- `controversial`: Thought-provoking/debate-generating tweets
+## Supported Datasets
 
-#### Comparing Multiple Systems
+### Format
+
+All datasets use persona-based format with:
+- `message`: Post text
+- `username` / `user_id`: User identifier
+- `persona`: User demographic/persona info
+- `training`: Train/test split
+
+### Loading Custom Dataset
 
 ```python
-from analysis.bias_analysis import compare_recommender_bias
+from data.loaders import PersonaDatasetLoader
 
-# Run experiments with different models
-results_claude = run_experiment(llm='claude-3-5-sonnet-20241022')
-results_gpt = run_experiment(llm='gpt-4')
+loader = PersonaDatasetLoader('./path/to/your/personas.pkl')
+df = loader.load(sample_size=5000, training_only=True)
+```
 
-# Compare bias
-comparison = compare_recommender_bias(
-    [results_claude, results_gpt],
-    labels=['Claude', 'GPT-4']
+## LLM Providers
+
+### OpenAI
+
+```python
+from utils.llm_client import get_llm_client
+
+client = get_llm_client('openai', 'gpt-4o-mini')
+response = client.generate('Your prompt here')
+```
+
+Supported models: `gpt-4`, `gpt-4-turbo`, `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo`
+
+### Anthropic
+
+```python
+client = get_llm_client('anthropic', 'claude-3-5-sonnet-20241022')
+response = client.generate('Your prompt here')
+```
+
+Supported models: `claude-3-5-sonnet-20241022`, `claude-3-opus-20240229`, `claude-3-haiku-20240307`
+
+### HuggingFace (Local)
+
+```python
+client = get_llm_client(
+    'huggingface',
+    'meta-llama/Llama-3.1-8B-Instruct',
+    device='auto'  # Uses GPU if available
 )
-
-print(comparison)
+response = client.generate('Your prompt here')
 ```
 
-## Citation
+Supported: Any HuggingFace causal LM with instruct/chat capability
 
-If you use the TwitterAAE dataset, please cite:
+## Results Structure
+
 ```
-S. Blodgett, L. Green, and B. O'Connor. Demographic Dialectal Variation in Social Media:
-A Case Study of African-American English. Proceedings of EMNLP. Austin. 2016.
+outputs/experiments/{dataset}_{provider}_{model}/
+├── prompt_style_results.pkl   # Raw trial results
+├── config.pkl                 # Experiment configuration
+├── plots/                     # Visualizations
+│   ├── sentiment_comparison.png
+│   ├── sentiment-polarity-comparison.png
+│   ├── polarization-score-comparison.png
+│   ├── formality-score-comparison.png
+│   └── topic_comparison.png
+└── summary_statistics.csv     # Aggregated metrics
 ```
+
+## Examples
+
+### Compare Multiple Models
+
+```bash
+# Run with GPT-4o-mini
+python run_experiment.py --dataset twitter --provider openai --model gpt-4o-mini
+
+# Run with Claude
+python run_experiment.py --dataset twitter --provider anthropic --model claude-3-5-sonnet-20241022
+
+# Run with Llama
+python run_experiment.py --dataset twitter --provider huggingface --model meta-llama/Llama-3.1-8B-Instruct
+
+# Analyze each
+python analyze_experiment.py --results-dir outputs/experiments/twitter_openai_gpt-4o-mini
+python analyze_experiment.py --results-dir outputs/experiments/twitter_anthropic_claude-3-5-sonnet-20241022
+python analyze_experiment.py --results-dir outputs/experiments/twitter_huggingface_meta-llama_Llama-3.1-8B-Instruct
+```
+
+### Test Specific Prompt Styles
+
+```bash
+python run_experiment.py \
+  --dataset reddit \
+  --provider openai \
+  --model gpt-4o-mini \
+  --styles popular controversial neutral \
+  --n-trials 30
+```
+
+### Quick Test Run
+
+```bash
+python run_experiment.py \
+  --dataset twitter \
+  --provider openai \
+  --model gpt-4o-mini \
+  --dataset-size 1000 \
+  --pool-size 50 \
+  --k 5 \
+  --n-trials 5
+```
+
+## Troubleshooting
+
+### Dataset not found
+Ensure datasets are in `./datasets/{platform}/personas.pkl` format
+
+### API key errors
+Set environment variables:
+```bash
+export OPENAI_API_KEY='...'
+export ANTHROPIC_API_KEY='...'
+```
+
+### HuggingFace model loading slow
+First load downloads model (can take 5-10 minutes for large models). Subsequent runs use cached model.
+
+### Out of memory with HuggingFace
+Use smaller models or reduce batch size:
+```python
+client = get_llm_client('huggingface', 'meta-llama/Llama-3.2-3B-Instruct')
+```
+
+## Contributing
+
+When adding new features:
+1. Follow existing code structure
+2. Add tests to `test_pipeline.py`
+3. Update README
+
+## License
+
+See LICENSE file for details.

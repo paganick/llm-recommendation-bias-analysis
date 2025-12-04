@@ -73,3 +73,10 @@ experiments/
 .cache/
 *.cache
 metadata_cache.csv
+
+# Datasets (local copies)
+datasets/
+
+# Old scripts and docs
+old_scripts/
+old_docs/

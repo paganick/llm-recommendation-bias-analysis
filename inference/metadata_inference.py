@@ -929,8 +929,12 @@ class MetadataInferenceEngine:
         # Drop duplicate 'text' column from metadata
         metadata_df = metadata_df.drop('text', axis=1, errors='ignore')
 
-        # Concatenate
-        result_df = pd.concat([df, metadata_df], axis=1)
+        # Reset indices to ensure proper alignment
+        df_reset = df.reset_index(drop=True)
+        metadata_df_reset = metadata_df.reset_index(drop=True)
+
+        # Concatenate with proper index alignment
+        result_df = pd.concat([df_reset, metadata_df_reset], axis=1)
 
         return result_df
 

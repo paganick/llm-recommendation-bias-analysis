@@ -1,5 +1,5 @@
 """
-Dataset loaders for TwitterAAE and other social media datasets.
+Dataset loaders for social media datasets (Twitter, Reddit, Bluesky, TwitterAAE).
 """
 
 import pandas as pd
@@ -7,6 +7,66 @@ import zipfile
 from typing import Optional, List, Dict
 from pathlib import Path
 import json
+
+
+class PersonaDatasetLoader:
+    """Loader for persona-based social media datasets (Twitter, Reddit, Bluesky)."""
+
+    def __init__(self, dataset_path: str):
+        """
+        Initialize loader.
+
+        Args:
+            dataset_path: Path to personas.pkl file
+        """
+        self.dataset_path = Path(dataset_path)
+        if not self.dataset_path.exists():
+            raise FileNotFoundError(f"Dataset not found: {dataset_path}")
+
+    def load(self, sample_size: Optional[int] = None,
+             training_only: bool = False) -> pd.DataFrame:
+        """
+        Load persona dataset.
+
+        Args:
+            sample_size: Number of posts to sample (None for all)
+            training_only: If True, only load training data
+
+        Returns:
+            DataFrame with columns:
+            - username (or user_id): User identifier
+            - persona: User demographic/persona information
+            - message: Post text
+            - reply_to: Reply information (if applicable)
+            - training: Train/test split indicator
+        """
+        print(f"Loading dataset from {self.dataset_path}...")
+
+        df = pd.read_pickle(self.dataset_path)
+
+        print(f"Loaded {len(df):,} posts")
+
+        # Filter training data if requested
+        if training_only and 'training' in df.columns:
+            df = df[df['training'] == 1]
+            print(f"Filtered to {len(df):,} training posts")
+
+        # Sample if requested
+        if sample_size and sample_size < len(df):
+            df = df.sample(n=sample_size, random_state=42)
+            print(f"Sampled {sample_size:,} posts")
+
+        return df
+
+    def get_dataset_info(self) -> Dict:
+        """Get information about the dataset."""
+        df = pd.read_pickle(self.dataset_path)
+        return {
+            'path': str(self.dataset_path),
+            'total_posts': len(df),
+            'columns': list(df.columns),
+            'has_training_split': 'training' in df.columns
+        }
 
 
 class TwitterAAELoader:
@@ -147,23 +207,37 @@ def load_dataset(dataset_name: str, **kwargs) -> pd.DataFrame:
     Convenience function to load datasets.
 
     Args:
-        dataset_name: 'twitteraae' or 'dadit'
+        dataset_name: 'twitter', 'reddit', 'bluesky', 'twitteraae', or 'dadit'
         **kwargs: Arguments passed to specific loader
 
     Returns:
         Loaded DataFrame
     """
-    if dataset_name.lower() == 'twitteraae':
+    dataset_name = dataset_name.lower()
+
+    # Persona-based datasets
+    if dataset_name in ['twitter', 'reddit', 'bluesky']:
+        default_path = f'./datasets/{dataset_name}/personas.pkl'
+        loader = PersonaDatasetLoader(kwargs.get('dataset_path', default_path))
+        return loader.load(
+            sample_size=kwargs.get('sample_size'),
+            training_only=kwargs.get('training_only', False)
+        )
+
+    # TwitterAAE dataset
+    elif dataset_name == 'twitteraae':
         loader = TwitterAAELoader(kwargs.get('zip_path',
                                             '/data/nicpag/AI_recsys_project/TwitterAAE-full-v1.zip'))
         return loader.load(version=kwargs.get('version', 'limited_aa'),
                           sample_size=kwargs.get('sample_size'))
 
-    elif dataset_name.lower() == 'dadit':
+    # DADIT dataset
+    elif dataset_name == 'dadit':
         loader = DADITLoader(kwargs.get('zip_path',
                                        '/data/nicpag/AI_recsys_project/DADIT_data_for_publishing.zip'))
         return loader.load(version=kwargs.get('version', 'test_anon'),
                           sample_size=kwargs.get('sample_size'))
 
     else:
-        raise ValueError(f"Unknown dataset: {dataset_name}")
+        raise ValueError(f"Unknown dataset: {dataset_name}. "
+                       f"Available: twitter, reddit, bluesky, twitteraae, dadit")

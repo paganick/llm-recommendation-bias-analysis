@@ -122,23 +122,118 @@ class OpenAIClient(BaseLLMClient):
         return response.choices[0].message.content
 
 
+class HuggingFaceClient(BaseLLMClient):
+    """Client for HuggingFace local models."""
+
+    def __init__(self, model: str = "meta-llama/Llama-3.1-8B-Instruct",
+                 api_key: Optional[str] = None,
+                 temperature: float = 0.7,
+                 max_tokens: int = 2000,
+                 device: str = "auto"):
+        super().__init__(model, api_key, temperature, max_tokens)
+
+        try:
+            import torch
+            from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+            self.torch = torch
+            self.pipeline = pipeline
+        except ImportError:
+            raise ImportError(
+                "transformers and torch not installed. "
+                "Run: pip install transformers torch accelerate"
+            )
+
+        print(f"Loading HuggingFace model: {model}")
+        print("This may take a few minutes on first load...")
+
+        # Initialize tokenizer and model
+        self.tokenizer = AutoTokenizer.from_pretrained(model)
+        self.model_obj = AutoModelForCausalLM.from_pretrained(
+            model,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            device_map=device,
+            trust_remote_code=True
+        )
+
+        # Create pipeline
+        self.pipe = self.pipeline(
+            "text-generation",
+            model=self.model_obj,
+            tokenizer=self.tokenizer,
+            device_map=device
+        )
+
+        print(f"Model loaded successfully on device: {device}")
+
+    def generate(self, prompt: str, **kwargs) -> str:
+        """Generate completion from HuggingFace model."""
+        temperature = kwargs.get('temperature', self.temperature)
+        max_tokens = kwargs.get('max_tokens', self.max_tokens)
+
+        # For instruct models, format the prompt
+        if "instruct" in self.model.lower() or "chat" in self.model.lower():
+            messages = [{"role": "user", "content": prompt}]
+            formatted_prompt = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        else:
+            formatted_prompt = prompt
+
+        # Generate
+        outputs = self.pipe(
+            formatted_prompt,
+            max_new_tokens=max_tokens,
+            temperature=temperature,
+            do_sample=temperature > 0,
+            pad_token_id=self.tokenizer.eos_token_id
+        )
+
+        # Extract generated text
+        generated_text = outputs[0]["generated_text"]
+
+        # Remove the prompt from output (for non-instruct models)
+        if not ("instruct" in self.model.lower() or "chat" in self.model.lower()):
+            generated_text = generated_text[len(formatted_prompt):].strip()
+        else:
+            # For instruct models, extract only the assistant response
+            if formatted_prompt in generated_text:
+                generated_text = generated_text[len(formatted_prompt):].strip()
+
+        # Update stats
+        self.call_count += 1
+        # Approximate token count
+        self.total_tokens += len(self.tokenizer.encode(prompt)) + len(self.tokenizer.encode(generated_text))
+
+        return generated_text
+
+
 def get_llm_client(provider: str, model: str, api_key: Optional[str] = None,
                    **kwargs) -> BaseLLMClient:
     """
     Factory function to get LLM client.
 
     Args:
-        provider: "anthropic" or "openai"
-        model: Model name
+        provider: "anthropic", "openai", or "huggingface"
+        model: Model name (e.g., "gpt-4", "claude-3-5-sonnet-20241022",
+              "meta-llama/Llama-3.1-8B-Instruct")
         api_key: API key (optional, can use env var)
-        **kwargs: Additional arguments (temperature, max_tokens, etc.)
+        **kwargs: Additional arguments (temperature, max_tokens, device, etc.)
 
     Returns:
         LLM client instance
     """
-    if provider.lower() == "anthropic":
+    provider = provider.lower()
+
+    if provider == "anthropic":
         return AnthropicClient(model=model, api_key=api_key, **kwargs)
-    elif provider.lower() == "openai":
+    elif provider == "openai":
         return OpenAIClient(model=model, api_key=api_key, **kwargs)
+    elif provider == "huggingface":
+        return HuggingFaceClient(model=model, api_key=api_key, **kwargs)
     else:
-        raise ValueError(f"Unknown provider: {provider}. Use 'anthropic' or 'openai'.")
+        raise ValueError(
+            f"Unknown provider: {provider}. "
+            f"Use 'anthropic', 'openai', or 'huggingface'."
+        )
