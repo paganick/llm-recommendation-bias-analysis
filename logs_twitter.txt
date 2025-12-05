@@ -1,0 +1,691 @@
+================================================================================
+LOADING TWITTER DATASET
+================================================================================
+
+Loading dataset from datasets/twitter/personas.pkl...
+Loaded 101,097 posts
+Filtered to 80,871 training posts
+Sampled 5,000 posts
+Dataset columns: ['reply_to', 'message', 'persona', 'username', 'training', 'baseline', 'flagged', 'personawithexamples', 'baselinewithexamples']
+Text column: message
+
+Inferring metadata (sentiment, topics, style, polarization)...
+This may take a few minutes...
+
+Inferring metadata for 5000 texts...
+  Processed 1000/5000 texts
+  Processed 2000/5000 texts
+  Processed 3000/5000 texts
+  Processed 4000/5000 texts
+  Processed 5000/5000 texts
+Completed metadata inference for 5000 texts
+Saved metadata cache to outputs/metadata_cache/twitter_metadata.pkl
+
+Final dataset: 5000 posts with metadata
+
+================================================================================
+INITIALIZING LLM CLIENT
+================================================================================
+
+Provider: openai
+Model: gpt-4o-mini
+
+
+================================================================================
+RUNNING PROMPT STYLE COMPARISON
+================================================================================
+
+Dataset: twitter
+Dataset size: 5000 posts
+Pool size: 100
+Recommendations per trial: 10
+Trials per style: 100
+Prompt styles: general, popular, engaging, informative, controversial, neutral
+
+
+[1/6] Testing prompt style: GENERAL
+================================================================================
+  Trial 1/100 ✓
+  Trial 2/100 ✓
+  Trial 3/100 ✓
+  Trial 4/100 ✓
+  Trial 5/100 ✓
+  Trial 6/100 ✓
+  Trial 7/100 ✓
+  Trial 8/100 ✓
+  Trial 9/100 ✓
+  Trial 10/100 ✓
+  Trial 11/100 ✓
+  Trial 12/100 ✓
+  Trial 13/100 ✓
+  Trial 14/100 ✓
+  Trial 15/100 ✓
+  Trial 16/100 ✓
+  Trial 17/100 ✓
+  Trial 18/100 ✓
+  Trial 19/100 ✓
+  Trial 20/100 ✓
+  Trial 21/100 ✓
+  Trial 22/100 ✓
+  Trial 23/100 ✓
+  Trial 24/100 ✓
+  Trial 25/100 ✓
+  Trial 26/100 ✓
+  Trial 27/100 ✓
+  Trial 28/100 ✓
+  Trial 29/100 ✓
+  Trial 30/100 ✓
+  Trial 31/100 ✓
+  Trial 32/100 ✓
+  Trial 33/100 ✓
+  Trial 34/100 ✓
+  Trial 35/100 ✓
+  Trial 36/100 ✓
+  Trial 37/100 ✓
+  Trial 38/100 ✓
+  Trial 39/100 ✓
+  Trial 40/100 ✓
+  Trial 41/100 ✓
+  Trial 42/100 ✓
+  Trial 43/100 ✓
+  Trial 44/100 ✓
+  Trial 45/100 ✓
+  Trial 46/100 ✓
+  Trial 47/100 ✓
+  Trial 48/100 ✓
+  Trial 49/100 ✓
+  Trial 50/100 ✓
+  Trial 51/100 ✓
+  Trial 52/100 ✓
+  Trial 53/100 ✓
+  Trial 54/100 ✓
+  Trial 55/100 ✓
+  Trial 56/100 ✓
+  Trial 57/100 ✓
+  Trial 58/100 ✓
+  Trial 59/100 ✓
+  Trial 60/100 ✓
+  Trial 61/100 ✓
+  Trial 62/100 ✓
+  Trial 63/100 ✓
+  Trial 64/100 ✓
+  Trial 65/100 ✓
+  Trial 66/100 ✓
+  Trial 67/100 ✓
+  Trial 68/100 ✓
+  Trial 69/100 ✓
+  Trial 70/100 ✓
+  Trial 71/100 ✓
+  Trial 72/100 ✓
+  Trial 73/100 ✓
+  Trial 74/100 ✓
+  Trial 75/100 ✓
+  Trial 76/100 ✓
+  Trial 77/100 ✓
+  Trial 78/100 ✓
+  Trial 79/100 ✓
+  Trial 80/100 ✓
+  Trial 81/100 ✓
+  Trial 82/100 ✓
+  Trial 83/100 ✓
+  Trial 84/100 ✓
+  Trial 85/100 ✓
+  Trial 86/100 ✓
+  Trial 87/100 ✓
+  Trial 88/100 ✓
+  Trial 89/100 ✓
+  Trial 90/100 ✓
+  Trial 91/100 ✓
+  Trial 92/100 ✓
+  Trial 93/100 ✓
+  Trial 94/100 ✓
+  Trial 95/100 ✓
+  Trial 96/100 ✓
+  Trial 97/100 ✓
+  Trial 98/100 ✓
+  Trial 99/100 ✓
+  Trial 100/100 ✓
+  Completed 100 trials for general
+
+[2/6] Testing prompt style: POPULAR
+================================================================================
+  Trial 1/100 ✓
+  Trial 2/100 ✓
+  Trial 3/100 ✓
+  Trial 4/100 ✓
+  Trial 5/100 ✓
+  Trial 6/100 ✓
+  Trial 7/100 ✓
+  Trial 8/100 ✓
+  Trial 9/100 ✓
+  Trial 10/100 ✓
+  Trial 11/100 ✓
+  Trial 12/100 ✓
+  Trial 13/100 ✓
+  Trial 14/100 ✓
+  Trial 15/100 ✓
+  Trial 16/100 ✓
+  Trial 17/100 ✓
+  Trial 18/100 ✓
+  Trial 19/100 ✓
+  Trial 20/100 ✓
+  Trial 21/100 ✓
+  Trial 22/100 ✓
+  Trial 23/100 ✓
+  Trial 24/100 ✓
+  Trial 25/100 ✓
+  Trial 26/100 ✓
+  Trial 27/100 ✓
+  Trial 28/100 ✓
+  Trial 29/100 ✓
+  Trial 30/100 ✓
+  Trial 31/100 ✓
+  Trial 32/100 ✓
+  Trial 33/100 ✓
+  Trial 34/100 ✓
+  Trial 35/100 ✓
+  Trial 36/100 ✓
+  Trial 37/100 ✓
+  Trial 38/100 ✓
+  Trial 39/100 ✓
+  Trial 40/100 ✓
+  Trial 41/100 ✓
+  Trial 42/100 ✓
+  Trial 43/100 ✓
+  Trial 44/100 ✓
+  Trial 45/100 ✓
+  Trial 46/100 ✓
+  Trial 47/100 ✓
+  Trial 48/100 ✓
+  Trial 49/100 ✓
+  Trial 50/100 ✓
+  Trial 51/100 ✓
+  Trial 52/100 ✓
+  Trial 53/100 ✓
+  Trial 54/100 ✓
+  Trial 55/100 ✓
+  Trial 56/100 ✓
+  Trial 57/100 ✓
+  Trial 58/100 ✓
+  Trial 59/100 ✓
+  Trial 60/100 ✓
+  Trial 61/100 ✓
+  Trial 62/100 ✓
+  Trial 63/100 ✓
+  Trial 64/100 ✓
+  Trial 65/100 ✓
+  Trial 66/100 ✓
+  Trial 67/100 ✓
+  Trial 68/100 ✓
+  Trial 69/100 ✓
+  Trial 70/100 ✓
+  Trial 71/100 ✓
+  Trial 72/100 ✓
+  Trial 73/100 ✓
+  Trial 74/100 ✓
+  Trial 75/100 ✓
+  Trial 76/100 ✓
+  Trial 77/100 ✓
+  Trial 78/100 ✓
+  Trial 79/100 ✓
+  Trial 80/100 ✓
+  Trial 81/100 ✓
+  Trial 82/100 ✓
+  Trial 83/100 ✓
+  Trial 84/100 ✓
+  Trial 85/100 ✓
+  Trial 86/100 ✓
+  Trial 87/100 ✓
+  Trial 88/100 ✓
+  Trial 89/100 ✓
+  Trial 90/100 ✓
+  Trial 91/100 ✓
+  Trial 92/100 ✓
+  Trial 93/100 ✓
+  Trial 94/100 ✓
+  Trial 95/100 ✓
+  Trial 96/100 ✓
+  Trial 97/100 ✓
+  Trial 98/100 ✓
+  Trial 99/100 ✓
+  Trial 100/100 ✓
+  Completed 100 trials for popular
+
+[3/6] Testing prompt style: ENGAGING
+================================================================================
+  Trial 1/100 ✓
+  Trial 2/100 ✓
+  Trial 3/100 ✓
+  Trial 4/100 ✓
+  Trial 5/100 ✓
+  Trial 6/100 ✓
+  Trial 7/100 ✓
+  Trial 8/100 ✓
+  Trial 9/100 ✓
+  Trial 10/100 ✓
+  Trial 11/100 ✓
+  Trial 12/100 ✓
+  Trial 13/100 ✓
+  Trial 14/100 ✓
+  Trial 15/100 ✓
+  Trial 16/100 ✓
+  Trial 17/100 ✓
+  Trial 18/100 ✓
+  Trial 19/100 ✓
+  Trial 20/100 ✓
+  Trial 21/100 ✓
+  Trial 22/100 ✓
+  Trial 23/100 ✓
+  Trial 24/100 ✓
+  Trial 25/100 ✓
+  Trial 26/100 ✓
+  Trial 27/100 ✓
+  Trial 28/100 ✓
+  Trial 29/100 ✓
+  Trial 30/100 ✓
+  Trial 31/100 ✓
+  Trial 32/100 ✓
+  Trial 33/100 ✓
+  Trial 34/100 ✓
+  Trial 35/100 ✓
+  Trial 36/100 ✓
+  Trial 37/100 ✓
+  Trial 38/100 ✓
+  Trial 39/100 ✓
+  Trial 40/100 ✓
+  Trial 41/100 ✓
+  Trial 42/100 ✓
+  Trial 43/100 ✓
+  Trial 44/100 ✓
+  Trial 45/100 ✓
+  Trial 46/100 ✓
+  Trial 47/100 ✓
+  Trial 48/100 ✓
+  Trial 49/100 ✓
+  Trial 50/100 ✓
+  Trial 51/100 ✓
+  Trial 52/100 ✓
+  Trial 53/100 ✓
+  Trial 54/100 ✓
+  Trial 55/100 ✓
+  Trial 56/100 ✓
+  Trial 57/100 ✓
+  Trial 58/100 ✓
+  Trial 59/100 ✓
+  Trial 60/100 ✓
+  Trial 61/100 ✓
+  Trial 62/100 ✓
+  Trial 63/100 ✓
+  Trial 64/100 ✓
+  Trial 65/100 ✓
+  Trial 66/100 ✓
+  Trial 67/100 ✓
+  Trial 68/100 ✓
+  Trial 69/100 ✓
+  Trial 70/100 ✓
+  Trial 71/100 ✓
+  Trial 72/100 ✓
+  Trial 73/100 ✓
+  Trial 74/100 ✓
+  Trial 75/100 ✓
+  Trial 76/100 ✓
+  Trial 77/100 ✓
+  Trial 78/100 ✓
+  Trial 79/100 ✓
+  Trial 80/100 ✓
+  Trial 81/100 ✓
+  Trial 82/100 ✓
+  Trial 83/100 ✓
+  Trial 84/100 ✓
+  Trial 85/100 ✓
+  Trial 86/100 ✓
+  Trial 87/100 ✓
+  Trial 88/100 ✓
+  Trial 89/100 ✓
+  Trial 90/100 ✓
+  Trial 91/100 ✓
+  Trial 92/100 ✓
+  Trial 93/100 ✓
+  Trial 94/100 ✓
+  Trial 95/100 ✓
+  Trial 96/100 ✓
+  Trial 97/100 ✓
+  Trial 98/100 ✓
+  Trial 99/100 ✓
+  Trial 100/100 ✓
+  Completed 100 trials for engaging
+
+[4/6] Testing prompt style: INFORMATIVE
+================================================================================
+  Trial 1/100 ✓
+  Trial 2/100 ✓
+  Trial 3/100 ✓
+  Trial 4/100 ✓
+  Trial 5/100 ✓
+  Trial 6/100 ✓
+  Trial 7/100 ✓
+  Trial 8/100 ✓
+  Trial 9/100 ✓
+  Trial 10/100 ✓
+  Trial 11/100 ✓
+  Trial 12/100 ✓
+  Trial 13/100 ✓
+  Trial 14/100 ✓
+  Trial 15/100 ✓
+  Trial 16/100 ✓
+  Trial 17/100 ✓
+  Trial 18/100 ✓
+  Trial 19/100 ✓
+  Trial 20/100 ✓
+  Trial 21/100 ✓
+  Trial 22/100 ✓
+  Trial 23/100 ✓
+  Trial 24/100 ✓
+  Trial 25/100 ✓
+  Trial 26/100 ✓
+  Trial 27/100 ✓
+  Trial 28/100 ✓
+  Trial 29/100 ✓
+  Trial 30/100 ✓
+  Trial 31/100 ✓
+  Trial 32/100 ✓
+  Trial 33/100 ✓
+  Trial 34/100 ✓
+  Trial 35/100 ✓
+  Trial 36/100 ✓
+  Trial 37/100 ✓
+  Trial 38/100 ✓
+  Trial 39/100 ✓
+  Trial 40/100 ✓
+  Trial 41/100 ✓
+  Trial 42/100 ✓
+  Trial 43/100 ✓
+  Trial 44/100 ✓
+  Trial 45/100 ✓
+  Trial 46/100 ✓
+  Trial 47/100 ✓
+  Trial 48/100 ✓
+  Trial 49/100 ✓
+  Trial 50/100 ✓
+  Trial 51/100 ✓
+  Trial 52/100 ✓
+  Trial 53/100 ✓
+  Trial 54/100 ✓
+  Trial 55/100 ✓
+  Trial 56/100 ✓
+  Trial 57/100 ✓
+  Trial 58/100 ✓
+  Trial 59/100 ✓
+  Trial 60/100 ✓
+  Trial 61/100 ✓
+  Trial 62/100 ✓
+  Trial 63/100 ✓
+  Trial 64/100 ✓
+  Trial 65/100 ✓
+  Trial 66/100 ✓
+  Trial 67/100 ✓
+  Trial 68/100 ✓
+  Trial 69/100 ✓
+  Trial 70/100 ✓
+  Trial 71/100 ✓
+  Trial 72/100 ✓
+  Trial 73/100 ✓
+  Trial 74/100 ✓
+  Trial 75/100 ✓
+  Trial 76/100 ✓
+  Trial 77/100 ✓
+  Trial 78/100 ✓
+  Trial 79/100 ✓
+  Trial 80/100 ✓
+  Trial 81/100 ✓
+  Trial 82/100 ✓
+  Trial 83/100 ✓
+  Trial 84/100 ✓
+  Trial 85/100 ✓
+  Trial 86/100 ✓
+  Trial 87/100 ✓
+  Trial 88/100 ✓
+  Trial 89/100 ✓
+  Trial 90/100 ✓
+  Trial 91/100 ✓
+  Trial 92/100 ✓
+  Trial 93/100 ✓
+  Trial 94/100 ✓
+  Trial 95/100 ✓
+  Trial 96/100 ✓
+  Trial 97/100 ✓
+  Trial 98/100 ✓
+  Trial 99/100 ✓
+  Trial 100/100 ✓
+  Completed 100 trials for informative
+
+[5/6] Testing prompt style: CONTROVERSIAL
+================================================================================
+  Trial 1/100 ✓
+  Trial 2/100 ✓
+  Trial 3/100 ✓
+  Trial 4/100 ✓
+  Trial 5/100 ✓
+  Trial 6/100 ✓
+  Trial 7/100 ✓
+  Trial 8/100 ✓
+  Trial 9/100 ✓
+  Trial 10/100 ✓
+  Trial 11/100 ✓
+  Trial 12/100 ✓
+  Trial 13/100 ✓
+  Trial 14/100 ✓
+  Trial 15/100 ✓
+  Trial 16/100 ✓
+  Trial 17/100 ✓
+  Trial 18/100 ✓
+  Trial 19/100 ✓
+  Trial 20/100 ✓
+  Trial 21/100 ✓
+  Trial 22/100 ✓
+  Trial 23/100 ✓
+  Trial 24/100 ✓
+  Trial 25/100 ✓
+  Trial 26/100 ✓
+  Trial 27/100 ✓
+  Trial 28/100 ✓
+  Trial 29/100 ✓
+  Trial 30/100 ✓
+  Trial 31/100 ✓
+  Trial 32/100 ✓
+  Trial 33/100 ✓
+  Trial 34/100 ✓
+  Trial 35/100 ✓
+  Trial 36/100 ✓
+  Trial 37/100 ✓
+  Trial 38/100 ✓
+  Trial 39/100 ✓
+  Trial 40/100 ✓
+  Trial 41/100 ✓
+  Trial 42/100 ✓
+  Trial 43/100 ✓
+  Trial 44/100 ✓
+  Trial 45/100 ✓
+  Trial 46/100 ✓
+  Trial 47/100 ✓
+  Trial 48/100 ✓
+  Trial 49/100 ✓
+  Trial 50/100 ✓
+  Trial 51/100 ✓
+  Trial 52/100 ✓
+  Trial 53/100 ✓
+  Trial 54/100 ✓
+  Trial 55/100 ✓
+  Trial 56/100 ✓
+  Trial 57/100 ✓
+  Trial 58/100 ✓
+  Trial 59/100 ✓
+  Trial 60/100 ✓
+  Trial 61/100 ✓
+  Trial 62/100 ✓
+  Trial 63/100 ✓
+  Trial 64/100 ✓
+  Trial 65/100 ✓
+  Trial 66/100 ✓
+  Trial 67/100 ✓
+  Trial 68/100 ✓
+  Trial 69/100 ✓
+  Trial 70/100 ✓
+  Trial 71/100 ✓
+  Trial 72/100 ✓
+  Trial 73/100 ✓
+  Trial 74/100 ✓
+  Trial 75/100 ✓
+  Trial 76/100 ✓
+  Trial 77/100 ✓
+  Trial 78/100 ✓
+  Trial 79/100 ✓
+  Trial 80/100 ✓
+  Trial 81/100 ✓
+  Trial 82/100 ✓
+  Trial 83/100 ✓
+  Trial 84/100 ✓
+  Trial 85/100 ✓
+  Trial 86/100 ✓
+  Trial 87/100 ✓
+  Trial 88/100 ✓
+  Trial 89/100 ✓
+  Trial 90/100 ✓
+  Trial 91/100 ✓
+  Trial 92/100 ✓
+  Trial 93/100 ✓
+  Trial 94/100 ✓
+  Trial 95/100 ✓
+  Trial 96/100 ✓
+  Trial 97/100 ✓
+  Trial 98/100 ✓
+  Trial 99/100 ✓
+  Trial 100/100 ✓
+  Completed 100 trials for controversial
+
+[6/6] Testing prompt style: NEUTRAL
+================================================================================
+  Trial 1/100 ✓
+  Trial 2/100 ✓
+  Trial 3/100 ✓
+  Trial 4/100 ✓
+  Trial 5/100 ✓
+  Trial 6/100 ✓
+  Trial 7/100 ✓
+  Trial 8/100 ✓
+  Trial 9/100 ✓
+  Trial 10/100 ✓
+  Trial 11/100 ✓
+  Trial 12/100 ✓
+  Trial 13/100 ✓
+  Trial 14/100 ✓
+  Trial 15/100 ✓
+  Trial 16/100 ✓
+  Trial 17/100 ✓
+  Trial 18/100 ✓
+  Trial 19/100 ✓
+  Trial 20/100 ✓
+  Trial 21/100 ✓
+  Trial 22/100 ✓
+  Trial 23/100 ✓
+  Trial 24/100 ✓
+  Trial 25/100 ✓
+  Trial 26/100 ✓
+  Trial 27/100 ✓
+  Trial 28/100 ✓
+  Trial 29/100 ✓
+  Trial 30/100 ✓
+  Trial 31/100 ✓
+  Trial 32/100 ✓
+  Trial 33/100 ✓
+  Trial 34/100 ✓
+  Trial 35/100 ✓
+  Trial 36/100 ✓
+  Trial 37/100 ✓
+  Trial 38/100 ✓
+  Trial 39/100 ✓
+  Trial 40/100 ✓
+  Trial 41/100 ✓
+  Trial 42/100 ✓
+  Trial 43/100 ✓
+  Trial 44/100 ✓
+  Trial 45/100 ✓
+  Trial 46/100 ✓
+  Trial 47/100 ✓
+  Trial 48/100 ✓
+  Trial 49/100 ✓
+  Trial 50/100 ✓
+  Trial 51/100 ✓
+  Trial 52/100 ✓
+  Trial 53/100 ✓
+  Trial 54/100 ✓
+  Trial 55/100 ✓
+  Trial 56/100 ✓
+  Trial 57/100 ✓
+  Trial 58/100 ✓
+  Trial 59/100 ✓
+  Trial 60/100 ✓
+  Trial 61/100 ✓
+  Trial 62/100 ✓
+  Trial 63/100 ✓
+  Trial 64/100 ✓
+  Trial 65/100 ✓
+  Trial 66/100 ✓
+  Trial 67/100 ✓
+  Trial 68/100 ✓
+  Trial 69/100 ✓
+  Trial 70/100 ✓
+  Trial 71/100 ✓
+  Trial 72/100 ✓
+  Trial 73/100 ✓
+  Trial 74/100 ✓
+  Trial 75/100 ✓
+  Trial 76/100 ✓
+  Trial 77/100 ✓
+  Trial 78/100 ✓
+  Trial 79/100 ✓
+  Trial 80/100 ✓
+  Trial 81/100 ✓
+  Trial 82/100 ✓
+  Trial 83/100 ✓
+  Trial 84/100 ✓
+  Trial 85/100 ✓
+  Trial 86/100 ✓
+  Trial 87/100 ✓
+  Trial 88/100 ✓
+  Trial 89/100 ✓
+  Trial 90/100 ✓
+  Trial 91/100 ✓
+  Trial 92/100 ✓
+  Trial 93/100 ✓
+  Trial 94/100 ✓
+  Trial 95/100 ✓
+  Trial 96/100 ✓
+  Trial 97/100 ✓
+  Trial 98/100 ✓
+  Trial 99/100 ✓
+  Trial 100/100 ✓
+  Completed 100 trials for neutral
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Dataset: twitter
+Model: openai / gpt-4o-mini
+Prompt styles tested: 6
+  Styles: general, popular, engaging, informative, controversial, neutral
+Trials per style: 100
+Total trials: 600
+Pool size per trial: 100
+Recommendations per trial: 10
+
+Results saved to: outputs/experiments/twitter_openai_gpt-4o-mini
+
+Next steps:
+  - Run: python analyze_experiment.py --results-dir outputs/experiments/twitter_openai_gpt-4o-mini
+  - Compare bias patterns across different prompt styles
+
+LLM Usage Statistics:
+  Total API calls: 600
+  Total tokens: 1,269,215

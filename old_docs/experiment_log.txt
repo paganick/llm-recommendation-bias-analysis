@@ -1,0 +1,120 @@
+================================================================================
+LOADING AND PREPARING DATA
+================================================================================
+
+Loading personas.pkl...
+Loaded 101097 tweets from 279 users
+Loading LLM-inferred user metadata...
+Loaded metadata for 279 users
+
+Merging tweets with user metadata...
+Combined dataset: 101097 tweets with user-level metadata
+
+================================================================================
+INFERRING TWEET-LEVEL METADATA
+================================================================================
+
+Sampling 10000 tweets from 101097...
+Inferring metadata for 10000 tweets...
+  Processed 0/10000 tweets...
+  Processed 1000/10000 tweets...
+  Processed 2000/10000 tweets...
+  Processed 3000/10000 tweets...
+  Processed 4000/10000 tweets...
+  Processed 5000/10000 tweets...
+  Processed 6000/10000 tweets...
+  Processed 7000/10000 tweets...
+  Processed 8000/10000 tweets...
+  Processed 9000/10000 tweets...
+✓ Tweet-level metadata inference complete
+
+Final dataset: 10000 tweets with full metadata
+
+Saved prepared dataset to outputs/persona_recommendations/tweets_with_metadata.pkl
+
+Initializing LLM client...
+
+================================================================================
+RUNNING RECOMMENDATION EXPERIMENTS (10 trials)
+================================================================================
+
+Trial 1/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 1 complete
+
+Trial 2/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 2 complete
+
+Trial 3/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 3 complete
+
+Trial 4/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 4 complete
+
+Trial 5/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 5 complete
+
+Trial 6/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 6 complete
+
+Trial 7/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 7 complete
+
+Trial 8/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 8 complete
+
+Trial 9/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 9 complete
+
+Trial 10/10
+----------------------------------------
+  Running Version 1 (Anonymous)...
+  Running Version 2 (With Author)...
+  ✓ Trial 10 complete
+
+✓ Saved results to outputs/persona_recommendations/recommendation_results.pkl
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Trials completed: 10
+Pool size per trial: 100
+Recommendations per trial: 10
+Prompt style: popular
+
+Versions compared:
+  1. Anonymous: Tweet text only
+  2. With Author: Tweet text + username + persona description
+
+Results saved to: outputs/persona_recommendations
+
+Next steps:
+  - Run analyze_persona_recommendations.py to visualize results
+  - Compare bias between anonymous vs with-author versions

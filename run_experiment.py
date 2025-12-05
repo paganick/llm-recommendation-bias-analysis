@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from data.loaders import load_dataset
 from inference.metadata_inference import infer_tweet_metadata
+from inference.persona_extraction import add_persona_attributes_to_dataframe
 from utils.llm_client import get_llm_client
 
 
@@ -61,7 +62,7 @@ def prepare_dataset_with_metadata(dataset_name: str, sample_size: int = 5000) ->
         print('This may take a few minutes...')
         print()
 
-        # Add metadata
+        # Add content metadata
         df_with_metadata = infer_tweet_metadata(
             df,
             text_column=text_col,
@@ -70,6 +71,12 @@ def prepare_dataset_with_metadata(dataset_name: str, sample_size: int = 5000) ->
             include_gender=False,  # Not reliable from text alone
             include_political=False  # Not reliable from text alone
         )
+
+        # Add persona attributes if persona column exists
+        if 'persona' in df_with_metadata.columns:
+            print('\nExtracting persona attributes (gender, age, race, political leaning)...')
+            df_with_metadata = add_persona_attributes_to_dataframe(df_with_metadata, 'persona')
+            print()
 
         # Save cache
         metadata_file.parent.mkdir(parents=True, exist_ok=True)
@@ -217,10 +224,10 @@ def main():
                        choices=['twitter', 'reddit', 'bluesky'],
                        help='Dataset to use')
     parser.add_argument('--provider', type=str, default='openai',
-                       choices=['openai', 'anthropic', 'huggingface'],
+                       choices=['openai', 'anthropic', 'gemini', 'huggingface'],
                        help='LLM provider')
     parser.add_argument('--model', type=str, default='gpt-4o-mini',
-                       help='Model name (e.g., gpt-4o-mini, claude-3-5-sonnet-20241022, meta-llama/Llama-3.1-8B-Instruct)')
+                       help='Model name (e.g., gpt-4o-mini, claude-3-5-sonnet-20241022, gemini-2.0-flash, gemini-2.5-flash, gemini-3-pro-preview, meta-llama/Llama-3.1-8B-Instruct)')
     parser.add_argument('--dataset-size', type=int, default=5000,
                        help='Number of posts to load from dataset')
     parser.add_argument('--pool-size', type=int, default=100,

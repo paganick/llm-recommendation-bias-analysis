@@ -4,79 +4,32 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
 
 # Virtual environments
 venv/
 env/
 ENV/
-recsys_env/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+# Jupyter
+.ipynb_checkpoints/
 
-# Environment variables
-.env
-.env.local
-
-# API Keys (IMPORTANT!)
-*.key
-*_api_key*
-credentials.json
-
-# Data files (too large for git)
-data/*.zip
-data/*.csv
-data/*.parquet
-*.zip
-TwitterAAE-full-v1/
-DADIT_data_for_publishing/
-
-# Outputs
+# Data and outputs
+datasets/
 outputs/
-logs/
+*.pkl
 *.log
-/tmp/
+
+# API keys
+.env
+*.key
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Experiments
-experiments/
-*.pkl
-*.pickle
-
-# Cache
-.cache/
-*.cache
-metadata_cache.csv
-
-# Datasets (local copies)
-datasets/
-
-# Old scripts and docs
-old_scripts/
-old_docs/

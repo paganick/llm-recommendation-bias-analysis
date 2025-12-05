@@ -85,10 +85,10 @@ def main():
                        choices=['twitter', 'reddit', 'bluesky'],
                        help='Dataset to use')
     parser.add_argument('--provider', type=str, default='openai',
-                       choices=['openai', 'anthropic', 'huggingface'],
+                       choices=['openai', 'anthropic', 'gemini', 'huggingface'],
                        help='LLM provider')
     parser.add_argument('--model', type=str, default='gpt-4o-mini',
-                       help='Model name')
+                       help='Model name (e.g., gpt-4o-mini, claude-3-5-sonnet-20241022, gemini-2.0-flash, gemini-2.5-flash, gemini-3-pro-preview)')
     parser.add_argument('--dataset-size', type=int, default=5000,
                        help='Number of posts to load from dataset')
     parser.add_argument('--pool-size', type=int, default=100,

@@ -4,12 +4,12 @@ Framework for analyzing bias in LLM-based recommendation systems across multiple
 
 ## Overview
 
-This project evaluates whether LLM recommender systems exhibit systematic biases when suggesting content. It supports multiple datasets (Twitter, Reddit, Bluesky) and multiple LLM providers (OpenAI, Anthropic, HuggingFace local models).
+This project evaluates whether LLM recommender systems exhibit systematic biases when suggesting content. It supports multiple datasets (Twitter, Reddit, Bluesky) and multiple LLM providers (OpenAI, Anthropic, Google Gemini, HuggingFace local models).
 
 ## Key Features
 
 - **Multiple Datasets**: Twitter, Reddit, Bluesky
-- **Multiple Models**: OpenAI GPT, Anthropic Claude, HuggingFace models (Llama, Mistral, etc.)
+- **Multiple Models**: OpenAI GPT, Anthropic Claude, Google Gemini, HuggingFace models (Llama, Mistral, etc.)
 - **Prompt Style Comparison**: Test how different prompt framings affect recommendations
 - **Comprehensive Bias Analysis**: Sentiment, topics, style, polarization
 - **Automated Metadata Inference**: Extract metadata from post text
@@ -102,6 +102,20 @@ python run_experiment.py \
   --n-trials 20
 ```
 
+#### Using Google Gemini:
+```bash
+export GEMINI_API_KEY='your-key-here'
+
+python run_experiment.py \
+  --dataset twitter \
+  --provider gemini \
+  --model gemini-2.0-flash \
+  --dataset-size 5000 \
+  --pool-size 100 \
+  --k 10 \
+  --n-trials 20
+```
+
 #### Using HuggingFace (Local Model):
 ```bash
 python run_experiment.py \
@@ -145,7 +159,7 @@ python run_experiment.py --help
 
 Key parameters:
 - `--dataset`: Dataset to use (`twitter`, `reddit`, `bluesky`)
-- `--provider`: LLM provider (`openai`, `anthropic`, `huggingface`)
+- `--provider`: LLM provider (`openai`, `anthropic`, `gemini`, `huggingface`)
 - `--model`: Model name
 - `--dataset-size`: Total posts to load
 - `--pool-size`: Posts per recommendation pool
@@ -248,6 +262,19 @@ response = client.generate('Your prompt here')
 
 Supported models: `claude-3-5-sonnet-20241022`, `claude-3-opus-20240229`, `claude-3-haiku-20240307`
 
+### Google Gemini
+
+```python
+client = get_llm_client('gemini', 'gemini-2.0-flash')
+response = client.generate('Your prompt here')
+```
+
+Supported models:
+- **Gemini 3.x**: `gemini-3-pro-preview` (latest, most powerful)
+- **Gemini 2.5**: `gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.5-flash-lite`
+- **Gemini 2.0**: `gemini-2.0-flash` (default), `gemini-2.0-flash-lite`
+- **Gemini 1.5**: `gemini-1.5-pro`, `gemini-1.5-flash` (older)
+
 ### HuggingFace (Local)
 
 ```python
@@ -330,6 +357,7 @@ Set environment variables:
 ```bash
 export OPENAI_API_KEY='...'
 export ANTHROPIC_API_KEY='...'
+export GEMINI_API_KEY='...'
 ```
 
 ### HuggingFace model loading slow

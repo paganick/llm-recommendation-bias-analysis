@@ -217,8 +217,22 @@ def load_dataset(dataset_name: str, **kwargs) -> pd.DataFrame:
 
     # Persona-based datasets
     if dataset_name in ['twitter', 'reddit', 'bluesky']:
+        # Try default path first, then alternative paths
         default_path = f'./datasets/{dataset_name}/personas.pkl'
-        loader = PersonaDatasetLoader(kwargs.get('dataset_path', default_path))
+        alt_paths = {
+            'bluesky': '../demdia_val/data/bluesky/personas.pkl'
+        }
+
+        # Check if default path exists, otherwise try alternative
+        if Path(default_path).exists():
+            dataset_path = default_path
+        elif dataset_name in alt_paths and Path(alt_paths[dataset_name]).exists():
+            dataset_path = alt_paths[dataset_name]
+            print(f"Using alternative path: {dataset_path}")
+        else:
+            dataset_path = default_path  # Will raise error in PersonaDatasetLoader
+
+        loader = PersonaDatasetLoader(kwargs.get('dataset_path', dataset_path))
         return loader.load(
             sample_size=kwargs.get('sample_size'),
             training_only=kwargs.get('training_only', False)

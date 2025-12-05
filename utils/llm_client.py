@@ -122,6 +122,57 @@ class OpenAIClient(BaseLLMClient):
         return response.choices[0].message.content
 
 
+class GeminiClient(BaseLLMClient):
+    """Client for Google Gemini API."""
+
+    def __init__(self, model: str = "gemini-2.0-flash",
+                 api_key: Optional[str] = None,
+                 temperature: float = 0.7,
+                 max_tokens: int = 2000):
+        super().__init__(model, api_key, temperature, max_tokens)
+
+        try:
+            import google.generativeai as genai
+            self.genai = genai
+        except ImportError:
+            raise ImportError("google-generativeai package not installed. Run: pip install google-generativeai")
+
+        # Initialize client
+        api_key = api_key or os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("Gemini API key required. Set GEMINI_API_KEY env var or pass api_key.")
+
+        self.genai.configure(api_key=api_key)
+        self.client = self.genai.GenerativeModel(model)
+
+    def generate(self, prompt: str, **kwargs) -> str:
+        """Generate completion from Gemini."""
+        temperature = kwargs.get('temperature', self.temperature)
+        max_tokens = kwargs.get('max_tokens', self.max_tokens)
+
+        # Configure generation
+        generation_config = self.genai.types.GenerationConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+        )
+
+        response = self.client.generate_content(
+            prompt,
+            generation_config=generation_config
+        )
+
+        # Update stats
+        self.call_count += 1
+        # Gemini provides token counts in usage_metadata
+        if hasattr(response, 'usage_metadata'):
+            self.total_tokens += (
+                response.usage_metadata.prompt_token_count +
+                response.usage_metadata.candidates_token_count
+            )
+
+        return response.text
+
+
 class HuggingFaceClient(BaseLLMClient):
     """Client for HuggingFace local models."""
 
@@ -215,8 +266,9 @@ def get_llm_client(provider: str, model: str, api_key: Optional[str] = None,
     Factory function to get LLM client.
 
     Args:
-        provider: "anthropic", "openai", or "huggingface"
+        provider: "anthropic", "openai", "gemini", or "huggingface"
         model: Model name (e.g., "gpt-4", "claude-3-5-sonnet-20241022",
+              "gemini-2.0-flash", "gemini-2.5-flash", "gemini-3-pro-preview",
               "meta-llama/Llama-3.1-8B-Instruct")
         api_key: API key (optional, can use env var)
         **kwargs: Additional arguments (temperature, max_tokens, device, etc.)
@@ -230,10 +282,12 @@ def get_llm_client(provider: str, model: str, api_key: Optional[str] = None,
         return AnthropicClient(model=model, api_key=api_key, **kwargs)
     elif provider == "openai":
         return OpenAIClient(model=model, api_key=api_key, **kwargs)
+    elif provider == "gemini":
+        return GeminiClient(model=model, api_key=api_key, **kwargs)
     elif provider == "huggingface":
         return HuggingFaceClient(model=model, api_key=api_key, **kwargs)
     else:
         raise ValueError(
             f"Unknown provider: {provider}. "
-            f"Use 'anthropic', 'openai', or 'huggingface'."
+            f"Use 'anthropic', 'openai', 'gemini', or 'huggingface'."
         )
