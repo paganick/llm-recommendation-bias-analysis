@@ -151,11 +151,16 @@ def compute_cramers_v(pool_vals, rec_vals):
     Creates: feature_values × (pool vs recommended)
     """
     try:
+        # CRITICAL FIX: Reset index to avoid misalignment between series
+        pool_vals = pool_vals.reset_index(drop=True)
+        rec_vals = rec_vals.reset_index(drop=True)
+
+        # Concatenate and reset index to avoid duplicates
+        combined = pd.concat([pool_vals, rec_vals], ignore_index=True)
+        labels = pd.Series(['pool']*len(pool_vals) + ['rec']*len(rec_vals))
+
         # Create proper contingency table: feature_values × (pool vs rec)
-        contingency = pd.crosstab(
-            pd.concat([pool_vals, rec_vals]),
-            pd.Series(['pool']*len(pool_vals) + ['rec']*len(rec_vals))
-        )
+        contingency = pd.crosstab(combined, labels)
 
         # Check if there's variation
         if contingency.shape[0] <= 1 or contingency.shape[1] <= 1:
@@ -206,11 +211,14 @@ def compute_bias_metric(pool_vals, rec_vals, feature_type):
         try:
             bias = compute_cramers_v(pool_vals, rec_vals)
 
+            # CRITICAL FIX: Reset index and use ignore_index for chi-square test
+            pool_vals_reset = pool_vals.reset_index(drop=True)
+            rec_vals_reset = rec_vals.reset_index(drop=True)
+            combined = pd.concat([pool_vals_reset, rec_vals_reset], ignore_index=True)
+            labels = pd.Series(['pool']*len(pool_vals_reset) + ['rec']*len(rec_vals_reset))
+
             # Chi-square test
-            contingency = pd.crosstab(
-                pd.concat([pool_vals, rec_vals]),
-                pd.Series(['pool']*len(pool_vals) + ['rec']*len(rec_vals))
-            )
+            contingency = pd.crosstab(combined, labels)
             chi2, p_val, dof, expected = chi2_contingency(contingency)
 
             if np.isnan(p_val):
