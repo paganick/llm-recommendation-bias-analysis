@@ -144,14 +144,47 @@ def main():
     print(f'Prompt styles: {", ".join(PROMPT_STYLES)}')
     print()
 
-    all_results = []
-    all_post_level_data = []  # NEW: Store post-level data
+    # Setup output directory
+    output_dir = Path(f'./outputs/experiments/{DATASET}_{PROVIDER}_{MODEL.replace("/", "_")}')
+    output_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = output_dir / 'checkpoint.pkl'
+
+    # Try to load checkpoint
+    if checkpoint_path.exists():
+        print('='*80)
+        print('RESUMING FROM CHECKPOINT')
+        print('='*80)
+        with open(checkpoint_path, 'rb') as f:
+            checkpoint = pickle.load(f)
+        all_results = checkpoint['all_results']
+        all_post_level_data = checkpoint['all_post_level_data']
+        completed_styles = checkpoint['completed_styles']
+        current_style_trials = checkpoint.get('current_style_trials', 0)
+        print(f'Resumed: {len(completed_styles)} styles completed: {completed_styles}')
+        if current_style_trials > 0:
+            print(f'Current style has {current_style_trials} trials completed')
+        print()
+    else:
+        all_results = []
+        all_post_level_data = []
+        completed_styles = []
+        current_style_trials = 0
 
     for style_idx, style in enumerate(PROMPT_STYLES):
+        # Skip if already completed
+        if style in completed_styles:
+            print(f'\n[{style_idx+1}/{len(PROMPT_STYLES)}] Skipping completed style: {style.upper()}')
+            continue
+
         print(f'\n[{style_idx+1}/{len(PROMPT_STYLES)}] Testing prompt style: {style.upper()}')
         print('='*80)
 
-        for trial_id in range(N_TRIALS):
+        # Determine starting trial (resume from checkpoint if applicable)
+        start_trial = current_style_trials if current_style_trials > 0 else 0
+        if start_trial > 0:
+            print(f'  Resuming from trial {start_trial + 1}/{N_TRIALS}')
+
+        for trial_id in range(start_trial, N_TRIALS):
             print(f'  Trial {trial_id + 1}/{N_TRIALS}', end=' ')
 
             # Sample pool for this trial
@@ -175,11 +208,35 @@ def main():
 
             print('✓')
 
-        print(f'  Completed {N_TRIALS} trials for {style}')
+            # Save checkpoint every 10 trials or at the end
+            if (trial_id + 1) % 10 == 0 or trial_id == N_TRIALS - 1:
+                checkpoint = {
+                    'all_results': all_results,
+                    'all_post_level_data': all_post_level_data,
+                    'completed_styles': completed_styles,
+                    'current_style': style,
+                    'current_style_trials': trial_id + 1
+                }
+                with open(checkpoint_path, 'wb') as f:
+                    pickle.dump(checkpoint, f)
+                print(f' [checkpoint saved at trial {trial_id + 1}]', end='')
 
-    # Save results
-    output_dir = Path(f'./outputs/experiments/{DATASET}_{PROVIDER}_{MODEL.replace("/", "_")}')
-    output_dir.mkdir(parents=True, exist_ok=True)
+        print(f'\n  Completed {N_TRIALS} trials for {style}')
+
+        # Mark style as completed and reset trial counter
+        completed_styles.append(style)
+        current_style_trials = 0
+        checkpoint = {
+            'all_results': all_results,
+            'all_post_level_data': all_post_level_data,
+            'completed_styles': completed_styles,
+            'current_style_trials': 0
+        }
+        with open(checkpoint_path, 'wb') as f:
+            pickle.dump(checkpoint, f)
+        print(f'  ✓ Style completed and checkpointed ({len(completed_styles)}/{len(PROMPT_STYLES)} styles done)')
+
+    # All styles completed - save final results
 
     # Save aggregate results (as before)
     results_path = output_dir / 'prompt_style_results.pkl'
@@ -210,6 +267,11 @@ def main():
     config_path = output_dir / 'config.pkl'
     with open(config_path, 'wb') as f:
         pickle.dump(config, f)
+
+    # Remove checkpoint file after successful completion
+    if checkpoint_path.exists():
+        checkpoint_path.unlink()
+        print('✓ Checkpoint file removed (experiment complete)')
 
     # Print summary
     print()

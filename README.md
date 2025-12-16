@@ -1,32 +1,58 @@
 # LLM Recommendation Bias Analysis
 
-Framework for analyzing bias in LLM-based recommendation systems across multiple social media platforms and models.
+A comprehensive framework for analyzing systematic biases in LLM-based recommendation systems across multiple social media platforms, models, and prompt styles.
 
 ## Overview
 
-This project evaluates whether LLM recommender systems exhibit systematic biases when suggesting content. It supports multiple datasets (Twitter, Reddit, Bluesky) and multiple LLM providers (OpenAI, Anthropic, Google Gemini, HuggingFace local models).
+This project evaluates whether large language model (LLM) recommender systems exhibit systematic biases when suggesting content. The framework provides end-to-end automation from running experiments to generating interactive dashboards with rigorous statistical analysis.
+
+**Current Status**: Complete analysis of 9 experiments (3 datasets × 3 models × 6 prompt styles = 540,000 recommendations analyzed)
+
+## Key Findings
+
+- **Models are consistent**: Only 3 significant differences (2.9%) between OpenAI, Anthropic, and Google models
+- **Datasets matter**: 30 significant differences (29.4%) across Twitter, Reddit, and Bluesky platforms
+- **Universal predictors**: `formality_score`, `polarization_score`, and structural features (`has_url`, `has_emoji`, `has_hashtag`) consistently predict LLM recommendations
+- **Prompt styles matter**: 40+ significant differences per experiment across 6 prompt styles
 
 ## Key Features
 
+### Experiment Framework
 - **Multiple Datasets**: Twitter, Reddit, Bluesky
-- **Multiple Models**: OpenAI GPT, Anthropic Claude, Google Gemini, HuggingFace models (Llama, Mistral, etc.)
-- **Prompt Style Comparison**: Test how different prompt framings affect recommendations
-- **Comprehensive Bias Analysis**: Sentiment, topics, style, polarization
-- **Automated Metadata Inference**: Extract metadata from post text
+- **Multiple Models**: OpenAI GPT-4o-mini, Anthropic Claude Sonnet 4.5, Google Gemini 2.0 Flash
+- **6 Prompt Styles**: general, popular, engaging, informative, controversial, neutral
+- **Large-scale Testing**: 100 trials × 100 posts per style = 60,000 recommendations per experiment
+
+### Analysis Pipeline
+- **Stratified Analysis**: Separate logistic regression per prompt style
+- **Statistical Comparison**: Wald tests for coefficient differences across styles
+- **Meta-Analysis**: Pooled effect sizes with heterogeneity testing (I²)
+- **Interactive Dashboards**: Plotly HTML visualizations with drill-down capabilities
 
 ## Project Structure
 
 ```
 llm-recommendation-bias-analysis/
-├── data/                  # Data loading
-├── inference/             # Metadata inference (preprocessing)
-├── utils/                 # LLM clients
-├── analysis/              # Bias analysis (postprocessing)
-├── datasets/              # Local dataset copies (not committed)
-├── outputs/               # Experiment results
-├── run_experiment.py      # Main experiment runner
-├── analyze_experiment.py  # Results analysis
-└── test_pipeline.py       # Pipeline tests
+├── data/                              # Data loading modules
+├── inference/                         # Metadata inference (preprocessing)
+├── utils/                             # LLM client wrappers
+├── analysis/                          # Bias analysis modules
+├── datasets/                          # Local dataset copies (not committed)
+├── outputs/                           # All experiment outputs
+│   ├── experiments/                   # Individual experiment results
+│   │   └── {dataset}_{provider}_{model}/
+│   │       ├── post_level_data.csv    # 60,000 recommendations
+│   │       └── stratified_analysis/   # Per-style analysis
+│   ├── meta_analysis/                 # Cross-experiment aggregation
+│   └── dashboards/                    # Interactive HTML visualizations
+├── run_experiment.py                  # Run single experiment
+├── run_all_experiments.py             # Run multiple experiments in parallel
+├── run_experiment_with_tracking.py    # Run with progress tracking
+├── stratified_analysis.py             # Stratified regression analysis
+├── meta_analysis.py                   # Cross-experiment meta-analysis
+├── create_dashboards.py               # Generate interactive dashboards
+├── run_full_analysis_pipeline.py      # Master orchestration script
+└── PROGRESS.md                        # Detailed progress tracker
 ```
 
 ## Quick Start
@@ -72,7 +98,107 @@ This verifies:
 - Metadata inference works
 - LLM clients initialize correctly
 
-### 4. Run Experiment
+### 4. Run Complete Analysis Pipeline
+
+The easiest way to get started is to use the master pipeline that handles everything:
+
+```bash
+# Run stratified analysis on all experiments + meta-analysis + dashboards
+python run_full_analysis_pipeline.py --analyze-all
+
+# Or analyze only experiments that haven't been analyzed yet
+python run_full_analysis_pipeline.py --analyze-all --skip-existing
+```
+
+This will:
+1. Run stratified regression analysis on each experiment
+2. Perform cross-experiment meta-analysis
+3. Generate interactive HTML dashboards
+4. Create a comprehensive summary report
+
+**Outputs**:
+- `outputs/experiments/*/stratified_analysis/` - Per-experiment analysis
+- `outputs/meta_analysis/` - Cross-experiment results
+- `outputs/dashboards/` - Interactive HTML dashboards
+- `outputs/analysis_summary_report.txt` - Summary of all experiments
+
+## Analysis Workflow
+
+### Step 1: Run Experiments
+
+#### Single Experiment with Progress Tracking
+
+```bash
+python run_experiment_with_tracking.py \
+  --dataset twitter \
+  --provider openai \
+  --model gpt-4o-mini \
+  --dataset-size 5000 \
+  --n-trials 100
+```
+
+This generates 60,000 recommendations (6 prompt styles × 100 trials × 100 posts)
+
+#### Multiple Experiments in Parallel
+
+```bash
+python run_all_experiments.py
+```
+
+Runs all configured experiments in parallel (edit the script to configure which experiments to run)
+
+### Step 2: Stratified Analysis (Per-Experiment)
+
+```bash
+python stratified_analysis.py \
+  --experiment-dir outputs/experiments/twitter_openai_gpt-4o-mini
+```
+
+**Outputs**:
+- `by_style/*.csv` - Logistic regression results per prompt style
+- `comparison/coefficient_comparison.csv` - Statistical tests across styles
+- `comparison/bias_by_style.csv` - Pool vs recommended bias analysis
+- `comparison/feature_importance.csv` - Feature rankings
+- `tables/regression_table_publication.csv` - Publication-ready tables
+
+### Step 3: Meta-Analysis (Cross-Experiment)
+
+```bash
+python meta_analysis.py \
+  --experiments-dir outputs/experiments \
+  --output-dir outputs/meta_analysis
+```
+
+**Outputs**:
+- `by_dataset/dataset_comparison.csv` - ANOVA comparing Twitter/Reddit/Bluesky
+- `by_model/model_comparison.csv` - ANOVA comparing OpenAI/Anthropic/Gemini
+- `meta_analysis/meta_effect_sizes.csv` - Pooled effects with heterogeneity (I²)
+- `meta_analysis_summary.txt` - Human-readable summary
+
+### Step 4: Interactive Dashboards
+
+```bash
+# Create all dashboards
+python create_dashboards.py --all \
+  --experiments-dir outputs/experiments \
+  --meta-dir outputs/meta_analysis \
+  --output-dir outputs/dashboards
+
+# Or create dashboard for a single experiment
+python create_dashboards.py \
+  --experiment-dir outputs/experiments/twitter_openai_gpt-4o-mini \
+  --output outputs/dashboards/twitter_dashboard.html
+```
+
+**Dashboard Features**:
+- Interactive filtering and drill-down
+- Hover tooltips with full statistics
+- Three tabs: Bias by Style, Feature Importance, Coefficient Comparisons
+- Cross-experiment dashboard with meta-analysis forest plots
+
+## Advanced Usage
+
+### Running Individual Experiments
 
 #### Using OpenAI:
 ```bash
@@ -287,6 +413,52 @@ response = client.generate('Your prompt here')
 ```
 
 Supported: Any HuggingFace causal LM with instruct/chat capability
+
+## Statistical Methodology
+
+### Stratified Analysis (Per-Experiment)
+
+For each experiment, we run separate logistic regression models per prompt style:
+
+**Model**: `logit(P(selected=1)) = β₀ + β₁X₁ + β₂X₂ + ... + βₚXₚ`
+
+**Features** (17 total):
+- **Sentiment**: polarity, subjectivity, positive, negative
+- **Formality**: formality_score
+- **Polarization**: polarization_score, controversy_level
+- **Structure**: text_length, word_count, avg_word_length, has_url, has_mention, has_hashtag, has_emoji
+- **Topic**: has_political_content, has_polarizing_content, misinformation_keywords
+
+**Statistical Tests**:
+1. **Wald Test** for coefficient differences between styles: `Z = (β₁ - β₂) / SE(β₁ - β₂)`
+2. **T-test** for pool vs recommended bias per feature per style
+3. **Multiple testing correction**: Bonferroni (α = 0.05/n_comparisons)
+
+### Meta-Analysis (Cross-Experiment)
+
+**Pooled Effect Sizes** using inverse-variance weighting:
+
+```
+θ_pooled = Σ(wᵢ × θᵢ) / Σwᵢ
+where wᵢ = 1/SE(θᵢ)²
+```
+
+**Heterogeneity Testing**:
+- **Cochran's Q statistic**: Tests if effects differ across experiments
+- **I² statistic**: Quantifies proportion of variation due to heterogeneity
+  - I² < 25%: Low heterogeneity
+  - I² 25-75%: Moderate heterogeneity
+  - I² > 75%: High heterogeneity
+
+**Dataset/Model Comparisons**: One-way ANOVA on coefficients
+- F-statistic tests if means differ across groups
+- Post-hoc Tukey HSD for pairwise comparisons
+
+### Power Analysis
+
+With 60,000 observations per experiment:
+- **Power** > 0.99 to detect small effects (OR ≥ 1.2) at α = 0.05
+- **Precision**: SE(β) ≈ 0.01-0.05 depending on feature prevalence
 
 ## Results Structure
 

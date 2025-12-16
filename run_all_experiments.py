@@ -94,7 +94,7 @@ def main():
         # Use default models for each provider
         default_models = {
             'openai': 'gpt-4o-mini',
-            'anthropic': 'claude-3-5-sonnet-20241022',
+            'anthropic': 'claude-3-5-haiku-20241022',  # Cheaper model
             'gemini': 'gemini-2.0-flash'
         }
 

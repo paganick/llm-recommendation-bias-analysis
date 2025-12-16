@@ -56,26 +56,70 @@ class AnthropicClient(BaseLLMClient):
 
         self.client = anthropic.Anthropic(api_key=api_key)
 
+        # Token-based rate limiting (30k tokens/min limit)
+        # Track tokens used in current minute window
+        import time
+        self.token_window_start = time.time()
+        self.tokens_in_window = 0
+        self.max_tokens_per_minute = 25000  # Stay under 30k limit
+
     def generate(self, prompt: str, **kwargs) -> str:
-        """Generate completion from Claude."""
+        """Generate completion from Claude with token-based rate limiting."""
+        import time
+        from anthropic import RateLimitError
+
         temperature = kwargs.get('temperature', self.temperature)
         max_tokens = kwargs.get('max_tokens', self.max_tokens)
 
-        response = self.client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            messages=[{
-                "role": "user",
-                "content": prompt
-            }]
-        )
+        # Estimate prompt tokens (rough: 4 chars per token)
+        estimated_tokens = len(prompt) // 4 + max_tokens
 
-        # Update stats
-        self.call_count += 1
-        self.total_tokens += response.usage.input_tokens + response.usage.output_tokens
+        # Check if we need to wait for window reset
+        elapsed = time.time() - self.token_window_start
+        if elapsed >= 60:
+            # Reset window
+            self.token_window_start = time.time()
+            self.tokens_in_window = 0
+        elif self.tokens_in_window + estimated_tokens > self.max_tokens_per_minute:
+            # Wait for window to reset
+            wait_time = 60 - elapsed
+            if wait_time > 0:
+                time.sleep(wait_time)
+            self.token_window_start = time.time()
+            self.tokens_in_window = 0
 
-        return response.content[0].text
+        # Retry logic for rate limits
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = self.client.messages.create(
+                    model=self.model,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    messages=[{
+                        "role": "user",
+                        "content": prompt
+                    }]
+                )
+
+                # Update stats and token tracking
+                self.call_count += 1
+                actual_tokens = response.usage.input_tokens + response.usage.output_tokens
+                self.total_tokens += actual_tokens
+                self.tokens_in_window += actual_tokens
+
+                return response.content[0].text
+
+            except RateLimitError as e:
+                if attempt < max_retries - 1:
+                    wait_time = 60
+                    print(f"  Rate limit hit, waiting {wait_time}s before retry {attempt + 2}/{max_retries}...")
+                    time.sleep(wait_time)
+                    # Reset window after wait
+                    self.token_window_start = time.time()
+                    self.tokens_in_window = 0
+                else:
+                    raise
 
 
 class OpenAIClient(BaseLLMClient):
@@ -145,8 +189,22 @@ class GeminiClient(BaseLLMClient):
         self.genai.configure(api_key=api_key)
         self.client = self.genai.GenerativeModel(model)
 
+        # Rate limiting for paid tier (appears to be lower than documented)
+        # Use 1.0s to be conservative: 60s / 1.0s = 60 req/min
+        import time
+        self.last_request_time = 0
+        self.min_request_interval = 1.0
+
     def generate(self, prompt: str, **kwargs) -> str:
-        """Generate completion from Gemini."""
+        """Generate completion from Gemini with rate limiting and retry logic."""
+        import time
+        from google.api_core.exceptions import ResourceExhausted
+
+        # Rate limiting: ensure minimum interval between requests
+        elapsed = time.time() - self.last_request_time
+        if elapsed < self.min_request_interval:
+            time.sleep(self.min_request_interval - elapsed)
+
         temperature = kwargs.get('temperature', self.temperature)
         max_tokens = kwargs.get('max_tokens', self.max_tokens)
 
@@ -156,21 +214,40 @@ class GeminiClient(BaseLLMClient):
             max_output_tokens=max_tokens,
         )
 
-        response = self.client.generate_content(
-            prompt,
-            generation_config=generation_config
-        )
+        # Retry logic with exponential backoff for rate limits
+        max_retries = 5
+        base_delay = 30  # Start with 30s wait for rate limit recovery
 
-        # Update stats
-        self.call_count += 1
-        # Gemini provides token counts in usage_metadata
-        if hasattr(response, 'usage_metadata'):
-            self.total_tokens += (
-                response.usage_metadata.prompt_token_count +
-                response.usage_metadata.candidates_token_count
-            )
+        for attempt in range(max_retries):
+            try:
+                response = self.client.generate_content(
+                    prompt,
+                    generation_config=generation_config
+                )
 
-        return response.text
+                self.last_request_time = time.time()
+
+                # Update stats
+                self.call_count += 1
+                # Gemini provides token counts in usage_metadata
+                if hasattr(response, 'usage_metadata'):
+                    self.total_tokens += (
+                        response.usage_metadata.prompt_token_count +
+                        response.usage_metadata.candidates_token_count
+                    )
+
+                return response.text
+
+            except ResourceExhausted as e:
+                if attempt < max_retries - 1:
+                    # Exponential backoff: 15s, 30s, 60s
+                    wait_time = base_delay * (2 ** attempt)
+                    print(f"  Rate limit hit, waiting {wait_time}s before retry {attempt + 2}/{max_retries}...")
+                    time.sleep(wait_time)
+                    self.last_request_time = time.time()
+                else:
+                    # Final attempt failed, re-raise
+                    raise
 
 
 class HuggingFaceClient(BaseLLMClient):

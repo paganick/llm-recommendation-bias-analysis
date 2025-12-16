@@ -23,6 +23,8 @@ ENV/
 # Data and outputs
 datasets/
 outputs/
+analysis_outputs/
+old_outputs_backup_*/
 *.pkl
 *.log
 
