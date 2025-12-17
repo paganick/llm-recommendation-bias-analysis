@@ -664,7 +664,7 @@ def generate_bias_heatmaps(comp_df):
         if pivot.empty:
             continue
 
-        # FIXED: Create custom annotations with asterisks for significant values
+        # FIXED: Create custom annotations with multi-level significance markers
         annot_array = np.empty_like(pivot, dtype=object)
         for i in range(pivot.shape[0]):
             for j in range(pivot.shape[1]):
@@ -672,7 +672,11 @@ def generate_bias_heatmaps(comp_df):
                 sig = pivot_sig.iloc[i, j] if not pd.isna(pivot_sig.iloc[i, j]) else 0
                 if pd.isna(val):
                     annot_array[i, j] = ''
-                elif sig > 0.5:  # More than 50% of conditions significant
+                elif sig > 0.75:  # More than 75% of conditions significant
+                    annot_array[i, j] = f'{val:.3f}***'
+                elif sig > 0.60:  # More than 60% of conditions significant
+                    annot_array[i, j] = f'{val:.3f}**'
+                elif sig > 0.50:  # More than 50% of conditions significant
                     annot_array[i, j] = f'{val:.3f}*'
                 else:
                     annot_array[i, j] = f'{val:.3f}'
@@ -680,7 +684,7 @@ def generate_bias_heatmaps(comp_df):
         fig, ax = plt.subplots(figsize=(14, 10))
         sns.heatmap(pivot, annot=annot_array, fmt='', cmap='RdYlGn_r',
                     center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
-        ax.set_title(f'Bias Heatmap (Normalized) - Prompt: {prompt}\n(* = p < 0.05)', fontweight='bold')
+        ax.set_title(f'Bias Heatmap (Normalized) - Prompt: {prompt}\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
         ax.set_xlabel('Dataset × Model')
         ax.set_ylabel('Feature')
         plt.tight_layout()
@@ -689,7 +693,7 @@ def generate_bias_heatmaps(comp_df):
 
     print("  ✓ Fully disaggregated heatmaps (by prompt style)")
 
-    # 2-5. Aggregated versions (same as before)
+    # 2-5. Aggregated versions with significance markers
     # Aggregated by dataset
     agg_dataset = comp_df_norm.groupby(['feature', 'dataset']).agg({
         'bias_normalized': 'mean',
@@ -703,10 +707,34 @@ def generate_bias_heatmaps(comp_df):
         aggfunc='mean'
     )
 
+    pivot_dataset_sig = agg_dataset.pivot_table(
+        values='significant',
+        index='feature',
+        columns='dataset',
+        aggfunc='mean'
+    )
+
+    # Create annotations with significance markers
+    annot_dataset = np.empty_like(pivot_dataset, dtype=object)
+    for i in range(pivot_dataset.shape[0]):
+        for j in range(pivot_dataset.shape[1]):
+            val = pivot_dataset.iloc[i, j]
+            sig = pivot_dataset_sig.iloc[i, j] if not pd.isna(pivot_dataset_sig.iloc[i, j]) else 0
+            if pd.isna(val):
+                annot_dataset[i, j] = ''
+            elif sig > 0.75:
+                annot_dataset[i, j] = f'{val:.3f}***'
+            elif sig > 0.60:
+                annot_dataset[i, j] = f'{val:.3f}**'
+            elif sig > 0.50:
+                annot_dataset[i, j] = f'{val:.3f}*'
+            else:
+                annot_dataset[i, j] = f'{val:.3f}'
+
     fig, ax = plt.subplots(figsize=(8, 10))
-    sns.heatmap(pivot_dataset, annot=True, fmt='.3f', cmap='RdYlGn_r',
+    sns.heatmap(pivot_dataset, annot=annot_dataset, fmt='', cmap='RdYlGn_r',
                 center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
-    ax.set_title('Bias by Dataset (Aggregated across Models & Prompts)', fontweight='bold')
+    ax.set_title('Bias by Dataset (Aggregated across Models & Prompts)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'aggregated_by_dataset.png', bbox_inches='tight')
     plt.close()
@@ -726,10 +754,34 @@ def generate_bias_heatmaps(comp_df):
         aggfunc='mean'
     )
 
+    pivot_model_sig = agg_model.pivot_table(
+        values='significant',
+        index='feature',
+        columns='provider',
+        aggfunc='mean'
+    )
+
+    # Create annotations with significance markers
+    annot_model = np.empty_like(pivot_model, dtype=object)
+    for i in range(pivot_model.shape[0]):
+        for j in range(pivot_model.shape[1]):
+            val = pivot_model.iloc[i, j]
+            sig = pivot_model_sig.iloc[i, j] if not pd.isna(pivot_model_sig.iloc[i, j]) else 0
+            if pd.isna(val):
+                annot_model[i, j] = ''
+            elif sig > 0.75:
+                annot_model[i, j] = f'{val:.3f}***'
+            elif sig > 0.60:
+                annot_model[i, j] = f'{val:.3f}**'
+            elif sig > 0.50:
+                annot_model[i, j] = f'{val:.3f}*'
+            else:
+                annot_model[i, j] = f'{val:.3f}'
+
     fig, ax = plt.subplots(figsize=(8, 10))
-    sns.heatmap(pivot_model, annot=True, fmt='.3f', cmap='RdYlGn_r',
+    sns.heatmap(pivot_model, annot=annot_model, fmt='', cmap='RdYlGn_r',
                 center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
-    ax.set_title('Bias by Model (Aggregated across Datasets & Prompts)', fontweight='bold')
+    ax.set_title('Bias by Model (Aggregated across Datasets & Prompts)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'aggregated_by_model.png', bbox_inches='tight')
     plt.close()
@@ -749,10 +801,34 @@ def generate_bias_heatmaps(comp_df):
         aggfunc='mean'
     )
 
+    pivot_prompt_sig = agg_prompt.pivot_table(
+        values='significant',
+        index='feature',
+        columns='prompt_style',
+        aggfunc='mean'
+    )
+
+    # Create annotations with significance markers
+    annot_prompt = np.empty_like(pivot_prompt, dtype=object)
+    for i in range(pivot_prompt.shape[0]):
+        for j in range(pivot_prompt.shape[1]):
+            val = pivot_prompt.iloc[i, j]
+            sig = pivot_prompt_sig.iloc[i, j] if not pd.isna(pivot_prompt_sig.iloc[i, j]) else 0
+            if pd.isna(val):
+                annot_prompt[i, j] = ''
+            elif sig > 0.75:
+                annot_prompt[i, j] = f'{val:.3f}***'
+            elif sig > 0.60:
+                annot_prompt[i, j] = f'{val:.3f}**'
+            elif sig > 0.50:
+                annot_prompt[i, j] = f'{val:.3f}*'
+            else:
+                annot_prompt[i, j] = f'{val:.3f}'
+
     fig, ax = plt.subplots(figsize=(10, 10))
-    sns.heatmap(pivot_prompt, annot=True, fmt='.3f', cmap='RdYlGn_r',
+    sns.heatmap(pivot_prompt, annot=annot_prompt, fmt='', cmap='RdYlGn_r',
                 center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
-    ax.set_title('Bias by Prompt Style (Aggregated across Datasets & Models)', fontweight='bold')
+    ax.set_title('Bias by Prompt Style (Aggregated across Datasets & Models)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'aggregated_by_prompt.png', bbox_inches='tight')
     plt.close()
@@ -770,13 +846,28 @@ def generate_bias_heatmaps(comp_df):
     agg_full_sorted = agg_full.sort_values('bias_normalized', ascending=False)
     bars = ax.barh(agg_full_sorted['feature'], agg_full_sorted['bias_normalized'], color='steelblue')
 
-    # Color bars by significance
+    # Color bars by significance level and add markers
     for i, (idx, row) in enumerate(agg_full_sorted.iterrows()):
-        if row['significant'] > 0.5:  # More than 50% of conditions significant
+        sig = row['significant']
+        if sig > 0.75:
+            bars[i].set_color('darkred')
+            marker = '***'
+        elif sig > 0.60:
             bars[i].set_color('coral')
+            marker = '**'
+        elif sig > 0.50:
+            bars[i].set_color('lightsalmon')
+            marker = '*'
+        else:
+            marker = ''
+
+        # Add significance marker at end of bar
+        if marker:
+            ax.text(row['bias_normalized'] + 0.01, i, marker,
+                   va='center', fontsize=12, fontweight='bold')
 
     ax.set_xlabel('Normalized Bias (0-1)')
-    ax.set_title('Overall Bias (Fully Aggregated)\nCoral = >50% significant', fontweight='bold')
+    ax.set_title('Overall Bias (Fully Aggregated)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     ax.grid(axis='x', alpha=0.3)
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'fully_aggregated.png', bbox_inches='tight')
