@@ -456,15 +456,17 @@ def generate_pool_vs_recommended():
 
     print(f"✓ Computed {len(comparisons)} comparisons across all conditions")
 
-    # Part 2: Generate aggregated comparison plots
-    print("\n2. Generating aggregated comparison plots (by prompt, dataset, model)...")
+    # Part 2: Save comparison data (but skip plot generation)
+    print("\n2. Saving comparison summary (skipping plot generation)...")
     comp_df = pd.DataFrame(comparisons)
 
     # Save full summary
     comp_df.to_csv(OUTPUT_DIR / 'pool_vs_recommended_summary.csv', index=False)
 
-    # Generate aggregated plots
-    generate_aggregated_comparisons_enhanced(comp_df)
+    # SKIP: Generate aggregated plots (not needed for now)
+    # generate_aggregated_comparisons_enhanced(comp_df)
+
+    print("✓ Comparison data saved (plots skipped)")
 
     return comp_df
 
@@ -1258,57 +1260,38 @@ def main():
     print("\n" + "="*80)
     print("COMPREHENSIVE ANALYSIS PIPELINE - 16 CORE FEATURES (FIXED)")
     print("="*80)
-    print("\nGenerating 7 types of outputs (with ALL fixes):")
+    print("\nGenerating 2 types of outputs:")
     print("  1. Feature distributions (fixed ordering, author_is_minority fixed)")
-    print("  2. Pool vs Recommended comparisons (192 aggregated plots)")
-    print("  3. Bias heatmaps (categorical bias FIXED, asterisks added)")
-    print("  4. Top 5 significant features (enhanced cumulative bars)")
-    print("  5. Feature importance rankings (fixed shap_file error)")
-    print("  6. Regression tables (LaTeX)")
-    print("  7. Per-feature bias plots (NEW - by dataset/model/prompt)")
+    print("  2. Bias heatmaps (categorical bias FIXED, asterisks added)")
     print("\n" + "="*80)
 
     # 1. Feature distributions
     generate_feature_distributions()
 
-    # 2. Pool vs Recommended
+    # 2. Compute comparisons (needed for bias heatmaps)
+    # Note: We compute but don't generate the aggregated plots
     comp_df = generate_pool_vs_recommended()
 
     # 3. Bias heatmaps
     generate_bias_heatmaps(comp_df)
 
+    # REMOVED sections (can be re-enabled later):
     # 4. Top 5 significant features
-    generate_top5_significant(comp_df)
-
-    # 5. Feature importance
-    try:
-        imp_df = generate_feature_importance_plots()
-    except Exception as e:
-        print(f"\n⚠ Warning: Feature importance failed: {str(e)}")
-        print("  Continuing with other outputs...")
-
+    # 5. Feature importance rankings
     # 6. Regression tables
-    generate_regression_tables(comp_df)
-
-    # 7. NEW: Per-feature bias plots
-    generate_per_feature_bias_plots(comp_df)
+    # 7. Per-feature bias plots
 
     # Final summary
     print("\n" + "="*80)
-    print("ALL OUTPUTS COMPLETE - ALL ISSUES FIXED!")
+    print("ALL OUTPUTS COMPLETE!")
     print("="*80)
     print("\nGenerated:")
     print(f"  1. {len(sum(FEATURES.values(), []))} distribution plots → {DIST_DIR}")
     print(f"      ✓ author_is_minority fixed (categorical)")
     print(f"      ✓ Political leaning expanded (7 categories)")
-    print(f"  2. 192 aggregated pool vs recommended comparisons → {COMPARE_AGG_DIR}")
-    print(f"  3. Bias heatmaps (5 aggregation levels) → {HEATMAP_DIR}")
+    print(f"  2. Bias heatmaps (5 aggregation levels) → {HEATMAP_DIR}")
     print(f"      ✓ Categorical bias FIXED (no more zeros!)")
     print(f"      ✓ Asterisks added for significance")
-    print(f"  4. Top 5 significant features + enhanced cumulative bars → {TOP5_DIR}")
-    print(f"  5. Feature importance plots → {IMPORTANCE_DIR}")
-    print(f"  6. LaTeX regression tables → {TABLES_DIR}")
-    print(f"  7. Per-feature bias plots (NEW) → {VIZ_DIR / '7_per_feature_bias'}")
     print(f"\nAll outputs saved to: {VIZ_DIR}")
     print("\n" + "="*80)
     print("VERIFICATION COMPLETE - Ready for interpretation!")
