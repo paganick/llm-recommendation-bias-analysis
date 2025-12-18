@@ -1009,14 +1009,8 @@ def generate_directional_bias_plots(df_directional):
 
         feature_type = feature_data['feature_type'].iloc[0]
 
-        # 1. By Prompt Style (6 subplots)
+        # By Prompt Style (6 subplots)
         generate_directional_by_prompt(feature, feature_data, feature_type, dir_bias_dir)
-
-        # 2. By Dataset (3 subplots)
-        generate_directional_by_dataset(feature, feature_data, feature_type, dir_bias_dir)
-
-        # 3. By Model (3 subplots)
-        generate_directional_by_model(feature, feature_data, feature_type, dir_bias_dir)
 
     print(f"\n✓ Saved directional bias plots to {dir_bias_dir}")
 
@@ -1671,9 +1665,9 @@ def main():
     print(f"  2. Bias heatmaps (5 aggregation levels) → {HEATMAP_DIR}")
     print(f"      ✓ Categorical bias FIXED (no more zeros!)")
     print(f"      ✓ Multi-level significance markers (*, **, ***)")
-    print(f"  3. Directional bias plots (48 plots) → {VIZ_DIR / '4_directional_bias'}")
+    print(f"  3. Directional bias plots (16 plots) → {VIZ_DIR / '4_directional_bias'}")
     print(f"      ✓ Shows which categories/values are favored")
-    print(f"      ✓ 3 plots per feature (by prompt/dataset/model)")
+    print(f"      ✓ 1 plot per feature (6 subplots per prompt style)")
     print(f"\nAll outputs saved to: {VIZ_DIR}")
     print("\n" + "="*80)
     print("VERIFICATION COMPLETE - Ready for interpretation!")
