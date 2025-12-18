@@ -886,7 +886,290 @@ def generate_bias_heatmaps(comp_df):
             print(f"  - {feat}: {count} conditions ({pct:.1f}%)")
 
 # ============================================================================
-# 4. TOP 5 SIGNIFICANT FEATURES - ENHANCED
+# 4. DIRECTIONAL BIAS PLOTS (NEW)
+# ============================================================================
+
+def compute_directional_bias():
+    """
+    Compute directional bias for each feature showing which categories/values are favored.
+
+    For categorical features: proportion_recommended - proportion_pool for each category
+    For continuous features: mean_recommended - mean_pool
+    """
+    print("\n" + "="*80)
+    print("COMPUTING DIRECTIONAL BIAS")
+    print("="*80)
+
+    all_directional_data = []
+    all_features = sum(FEATURES.values(), [])
+
+    # Process each dataset × provider × prompt combination
+    for dataset in DATASETS:
+        for provider in PROVIDERS:
+            df = load_experiment_data(dataset, provider)
+            if df is None:
+                continue
+
+            for prompt in PROMPT_STYLES:
+                prompt_df = df[df['prompt_style'] == prompt]
+
+                # Split into pool and recommended
+                pool = prompt_df[prompt_df['selected'] == 0].copy()
+                recommended = prompt_df[prompt_df['selected'] == 1].copy()
+
+                if len(pool) == 0 or len(recommended) == 0:
+                    continue
+
+                # Process each feature
+                for feature in all_features:
+                    if feature not in df.columns:
+                        continue
+
+                    feature_type = FEATURE_TYPES[feature]
+
+                    if feature_type == 'categorical':
+                        # Get all unique categories
+                        all_categories = sorted(prompt_df[feature].dropna().unique())
+
+                        for category in all_categories:
+                            # Compute proportions
+                            prop_pool = (pool[feature] == category).sum() / len(pool) if len(pool) > 0 else 0
+                            prop_rec = (recommended[feature] == category).sum() / len(recommended) if len(recommended) > 0 else 0
+
+                            # Directional bias: positive = over-represented, negative = under-represented
+                            dir_bias = prop_rec - prop_pool
+
+                            all_directional_data.append({
+                                'feature': feature,
+                                'category': str(category),
+                                'dataset': dataset,
+                                'provider': provider,
+                                'prompt_style': prompt,
+                                'directional_bias': dir_bias,
+                                'prop_pool': prop_pool,
+                                'prop_recommended': prop_rec,
+                                'feature_type': 'categorical'
+                            })
+
+                    else:  # continuous
+                        # Compute mean difference
+                        mean_pool = pool[feature].mean()
+                        mean_rec = recommended[feature].mean()
+                        dir_bias = mean_rec - mean_pool
+
+                        # Also compute standardized difference for reference
+                        std_pool = pool[feature].std()
+                        std_diff = dir_bias / std_pool if std_pool > 0 else 0
+
+                        all_directional_data.append({
+                            'feature': feature,
+                            'category': 'mean_difference',  # For continuous, single "category"
+                            'dataset': dataset,
+                            'provider': provider,
+                            'prompt_style': prompt,
+                            'directional_bias': dir_bias,
+                            'mean_pool': mean_pool,
+                            'mean_recommended': mean_rec,
+                            'std_diff': std_diff,
+                            'feature_type': 'continuous'
+                        })
+
+    df_directional = pd.DataFrame(all_directional_data)
+    print(f"✓ Computed directional bias for {len(df_directional)} feature-category-condition combinations")
+
+    return df_directional
+
+
+def generate_directional_bias_plots(df_directional):
+    """
+    Generate directional bias plots showing which categories/values are favored.
+
+    For each feature, create 3 plots:
+    1. By prompt style (6 subplots)
+    2. By dataset (3 subplots)
+    3. By model (3 subplots)
+    """
+    print("\n" + "="*80)
+    print("GENERATING DIRECTIONAL BIAS PLOTS")
+    print("="*80)
+
+    # Create output directory
+    dir_bias_dir = VIZ_DIR / '4_directional_bias'
+    dir_bias_dir.mkdir(exist_ok=True)
+
+    all_features = sum(FEATURES.values(), [])
+
+    for feature in all_features:
+        print(f"\nGenerating directional bias plots for: {feature}")
+
+        feature_data = df_directional[df_directional['feature'] == feature].copy()
+        if len(feature_data) == 0:
+            print(f"  ⚠ No data for {feature}")
+            continue
+
+        feature_type = feature_data['feature_type'].iloc[0]
+
+        # 1. By Prompt Style (6 subplots)
+        generate_directional_by_prompt(feature, feature_data, feature_type, dir_bias_dir)
+
+        # 2. By Dataset (3 subplots)
+        generate_directional_by_dataset(feature, feature_data, feature_type, dir_bias_dir)
+
+        # 3. By Model (3 subplots)
+        generate_directional_by_model(feature, feature_data, feature_type, dir_bias_dir)
+
+    print(f"\n✓ Saved directional bias plots to {dir_bias_dir}")
+
+
+def generate_directional_by_prompt(feature, feature_data, feature_type, output_dir):
+    """Generate plot with 6 subplots (one per prompt style)"""
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+    axes = axes.flatten()
+
+    for idx, prompt_style in enumerate(PROMPT_STYLES):
+        ax = axes[idx]
+        data = feature_data[feature_data['prompt_style'] == prompt_style].copy()
+
+        if len(data) == 0:
+            ax.text(0.5, 0.5, 'No data', ha='center', va='center', transform=ax.transAxes)
+            ax.set_title(f'{prompt_style}', fontweight='bold')
+            continue
+
+        # Aggregate across datasets and models
+        if feature_type == 'categorical':
+            # Create pivot: categories × (dataset_model)
+            data['dataset_model'] = data['dataset'] + '\n' + data['provider']
+            pivot = data.groupby(['category', 'dataset_model'])['directional_bias'].mean().reset_index()
+            pivot_wide = pivot.pivot(index='category', columns='dataset_model', values='directional_bias')
+
+            # Sort categories by average bias
+            pivot_wide['avg'] = pivot_wide.mean(axis=1)
+            pivot_wide = pivot_wide.sort_values('avg', ascending=False).drop('avg', axis=1)
+
+            # Create heatmap
+            sns.heatmap(pivot_wide, annot=True, fmt='.3f', cmap='RdYlGn', center=0,
+                       vmin=-0.3, vmax=0.3, ax=ax, cbar_kws={'label': 'Directional Bias'})
+            ax.set_ylabel('')
+            ax.set_xlabel('')
+        else:  # continuous
+            # Bar chart for dataset × model
+            data['dataset_model'] = data['dataset'] + '_' + data['provider']
+            agg = data.groupby('dataset_model')['directional_bias'].mean().sort_values()
+
+            colors = ['red' if x < 0 else 'green' for x in agg.values]
+            agg.plot(kind='barh', ax=ax, color=colors, edgecolor='black')
+            ax.axvline(0, color='black', linestyle='--', linewidth=1)
+            ax.set_xlabel('Mean Difference (Rec - Pool)')
+            ax.set_ylabel('')
+
+        ax.set_title(f'{prompt_style}', fontweight='bold', fontsize=12)
+
+    fig.suptitle(f'Directional Bias: {feature}\n(By Prompt Style)',
+                fontweight='bold', fontsize=14)
+    plt.tight_layout()
+    plt.savefig(output_dir / f'{feature}_by_prompt.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def generate_directional_by_dataset(feature, feature_data, feature_type, output_dir):
+    """Generate plot with 3 subplots (one per dataset)"""
+
+    datasets = sorted(feature_data['dataset'].unique())
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    for idx, dataset in enumerate(datasets):
+        ax = axes[idx]
+        data = feature_data[feature_data['dataset'] == dataset].copy()
+
+        if len(data) == 0:
+            ax.text(0.5, 0.5, 'No data', ha='center', va='center', transform=ax.transAxes)
+            ax.set_title(f'{dataset}', fontweight='bold')
+            continue
+
+        # Aggregate across models and prompt styles
+        if feature_type == 'categorical':
+            data['model_prompt'] = data['provider'] + '\n' + data['prompt_style']
+            pivot = data.groupby(['category', 'model_prompt'])['directional_bias'].mean().reset_index()
+            pivot_wide = pivot.pivot(index='category', columns='model_prompt', values='directional_bias')
+
+            # Sort categories
+            pivot_wide['avg'] = pivot_wide.mean(axis=1)
+            pivot_wide = pivot_wide.sort_values('avg', ascending=False).drop('avg', axis=1)
+
+            sns.heatmap(pivot_wide, annot=True, fmt='.3f', cmap='RdYlGn', center=0,
+                       vmin=-0.3, vmax=0.3, ax=ax, cbar_kws={'label': 'Directional Bias'})
+            ax.set_ylabel('')
+            ax.set_xlabel('')
+        else:  # continuous
+            data['model_prompt'] = data['provider'] + '_' + data['prompt_style']
+            agg = data.groupby('model_prompt')['directional_bias'].mean().sort_values()
+
+            colors = ['red' if x < 0 else 'green' for x in agg.values]
+            agg.plot(kind='barh', ax=ax, color=colors, edgecolor='black')
+            ax.axvline(0, color='black', linestyle='--', linewidth=1)
+            ax.set_xlabel('Mean Difference')
+            ax.set_ylabel('')
+
+        ax.set_title(f'{dataset}', fontweight='bold', fontsize=12)
+
+    fig.suptitle(f'Directional Bias: {feature}\n(By Dataset)',
+                fontweight='bold', fontsize=14)
+    plt.tight_layout()
+    plt.savefig(output_dir / f'{feature}_by_dataset.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def generate_directional_by_model(feature, feature_data, feature_type, output_dir):
+    """Generate plot with 3 subplots (one per model)"""
+
+    providers = sorted(feature_data['provider'].unique())
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    for idx, provider in enumerate(providers):
+        ax = axes[idx]
+        data = feature_data[feature_data['provider'] == provider].copy()
+
+        if len(data) == 0:
+            ax.text(0.5, 0.5, 'No data', ha='center', va='center', transform=ax.transAxes)
+            ax.set_title(f'{provider}', fontweight='bold')
+            continue
+
+        # Aggregate across datasets and prompt styles
+        if feature_type == 'categorical':
+            data['dataset_prompt'] = data['dataset'] + '\n' + data['prompt_style']
+            pivot = data.groupby(['category', 'dataset_prompt'])['directional_bias'].mean().reset_index()
+            pivot_wide = pivot.pivot(index='category', columns='dataset_prompt', values='directional_bias')
+
+            # Sort categories
+            pivot_wide['avg'] = pivot_wide.mean(axis=1)
+            pivot_wide = pivot_wide.sort_values('avg', ascending=False).drop('avg', axis=1)
+
+            sns.heatmap(pivot_wide, annot=True, fmt='.3f', cmap='RdYlGn', center=0,
+                       vmin=-0.3, vmax=0.3, ax=ax, cbar_kws={'label': 'Directional Bias'})
+            ax.set_ylabel('')
+            ax.set_xlabel('')
+        else:  # continuous
+            data['dataset_prompt'] = data['dataset'] + '_' + data['prompt_style']
+            agg = data.groupby('dataset_prompt')['directional_bias'].mean().sort_values()
+
+            colors = ['red' if x < 0 else 'green' for x in agg.values]
+            agg.plot(kind='barh', ax=ax, color=colors, edgecolor='black')
+            ax.axvline(0, color='black', linestyle='--', linewidth=1)
+            ax.set_xlabel('Mean Difference')
+            ax.set_ylabel('')
+
+        ax.set_title(f'{provider}', fontweight='bold', fontsize=12)
+
+    fig.suptitle(f'Directional Bias: {feature}\n(By Model)',
+                fontweight='bold', fontsize=14)
+    plt.tight_layout()
+    plt.savefig(output_dir / f'{feature}_by_model.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+# ============================================================================
+# 5. TOP 5 SIGNIFICANT FEATURES - ENHANCED
 # ============================================================================
 
 def generate_top5_significant(comp_df):
@@ -1349,11 +1632,12 @@ def generate_per_feature_bias_plots(comp_df):
 
 def main():
     print("\n" + "="*80)
-    print("COMPREHENSIVE ANALYSIS PIPELINE - 16 CORE FEATURES (FIXED)")
+    print("COMPREHENSIVE ANALYSIS PIPELINE - 16 CORE FEATURES")
     print("="*80)
-    print("\nGenerating 2 types of outputs:")
-    print("  1. Feature distributions (fixed ordering, author_is_minority fixed)")
-    print("  2. Bias heatmaps (categorical bias FIXED, asterisks added)")
+    print("\nGenerating 3 types of outputs:")
+    print("  1. Feature distributions")
+    print("  2. Bias heatmaps (magnitude)")
+    print("  3. Directional bias plots (NEW - shows which categories are favored)")
     print("\n" + "="*80)
 
     # 1. Feature distributions
@@ -1366,11 +1650,15 @@ def main():
     # 3. Bias heatmaps
     generate_bias_heatmaps(comp_df)
 
+    # 4. Directional bias plots (NEW)
+    df_directional = compute_directional_bias()
+    generate_directional_bias_plots(df_directional)
+
     # REMOVED sections (can be re-enabled later):
-    # 4. Top 5 significant features
-    # 5. Feature importance rankings
-    # 6. Regression tables
-    # 7. Per-feature bias plots
+    # 5. Top 5 significant features
+    # 6. Feature importance rankings
+    # 7. Regression tables
+    # 8. Per-feature bias plots
 
     # Final summary
     print("\n" + "="*80)
@@ -1382,7 +1670,10 @@ def main():
     print(f"      ✓ Political leaning expanded (7 categories)")
     print(f"  2. Bias heatmaps (5 aggregation levels) → {HEATMAP_DIR}")
     print(f"      ✓ Categorical bias FIXED (no more zeros!)")
-    print(f"      ✓ Asterisks added for significance")
+    print(f"      ✓ Multi-level significance markers (*, **, ***)")
+    print(f"  3. Directional bias plots (48 plots) → {VIZ_DIR / '4_directional_bias'}")
+    print(f"      ✓ Shows which categories/values are favored")
+    print(f"      ✓ 3 plots per feature (by prompt/dataset/model)")
     print(f"\nAll outputs saved to: {VIZ_DIR}")
     print("\n" + "="*80)
     print("VERIFICATION COMPLETE - Ready for interpretation!")
