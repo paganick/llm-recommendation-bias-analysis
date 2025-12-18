@@ -100,7 +100,7 @@ PROMPT_STYLES = ['general', 'popular', 'engaging', 'informative', 'controversial
 
 # Output directories
 OUTPUT_DIR = Path('analysis_outputs')
-VIZ_DIR = OUTPUT_DIR / 'visualizations_16features_fixed'
+VIZ_DIR = OUTPUT_DIR / 'visualizations'
 DIST_DIR = VIZ_DIR / '1_distributions'
 COMPARE_DIR = VIZ_DIR / '2_pool_vs_recommended'
 COMPARE_AGG_DIR = COMPARE_DIR / 'aggregated'  # NEW: Aggregated plots
