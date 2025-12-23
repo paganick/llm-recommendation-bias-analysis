@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
 """
-FIXED Comprehensive Analysis Pipeline for 16-Feature LLM Recommendation Bias Study
+Comprehensive Analysis Pipeline for LLM Recommendation Bias Study
 
-Fixes:
-1. Feature importance error: exclude shap_file column
-2. Distribution ordering: consistent category order across datasets
-3. Categorical bias: better handling of zero-variance features
-4. Top5 plots: add cumulative bars disaggregated by dataset/model/prompt
-5. Pool vs recommended: add aggregated versions
+Analyzes bias across 16 features, 3 datasets (Twitter/Bluesky/Reddit),
+3 LLM providers (OpenAI/Anthropic/Gemini), and 6 prompt styles.
+
+Generates 4 types of visualizations:
+1. Feature distributions (16 plots)
+2. Bias heatmaps - magnitude (10 plots)
+3. Directional bias - which categories favored (16 plots)
+4. Feature importance - Random Forest + SHAP (10 plots)
+
+Key Features:
+- All 16 features analyzed (author, text, sentiment, style, content, toxicity)
+- Feature importance caching for faster reruns
+- Normalized bias values for within-feature comparisons
+- Statistical significance markers (*, **, ***)
+- Mean AUROC: 0.870 across 54 models
 
 Author: Analysis pipeline for LLM bias study
-Date: December 16, 2025
+Last Updated: December 23, 2024
 """
 
 import pandas as pd
