@@ -20,6 +20,10 @@ import seaborn as sns
 from pathlib import Path
 from scipy import stats
 from scipy.stats import chi2_contingency
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import roc_auc_score
+import shap
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -1163,7 +1167,359 @@ def generate_directional_by_model(feature, feature_data, feature_type, output_di
 
 
 # ============================================================================
-# 5. TOP 5 SIGNIFICANT FEATURES - ENHANCED
+# 5. FEATURE IMPORTANCE ANALYSIS (NEW)
+# ============================================================================
+
+def prepare_ml_features(df: pd.DataFrame, all_features: list) -> tuple:
+    """
+    Prepare features for ML model - standardize and one-hot encode
+    Returns: X (feature matrix), y (target), feature_names (list)
+    """
+    # Separate numerical and categorical features
+    available_numerical = [f for f in all_features if f in df.columns and FEATURE_TYPES[f] == 'continuous']
+    available_categorical = [f for f in all_features if f in df.columns and FEATURE_TYPES[f] == 'categorical']
+
+    # Start with numerical features
+    X = df[available_numerical].copy()
+
+    # One-hot encode categorical features
+    for cat_feat in available_categorical:
+        dummies = pd.get_dummies(df[cat_feat], prefix=cat_feat, drop_first=True)
+        X = pd.concat([X, dummies], axis=1)
+
+    # Fill missing values
+    for col in X.columns:
+        if X[col].isna().any():
+            if X[col].dtype in ['float64', 'int64']:
+                X[col].fillna(X[col].median(), inplace=True)
+            else:
+                X[col].fillna(X[col].mode()[0] if len(X[col].mode()) > 0 else 0, inplace=True)
+
+    # Target variable
+    y = df['selected'].astype(int)
+
+    # Feature names
+    feature_names = X.columns.tolist()
+
+    return X, y, feature_names
+
+
+def compute_feature_importance():
+    """
+    Compute feature importance using Random Forest for each condition.
+    Returns DataFrame with importance scores for all features and conditions.
+    """
+    print("\n" + "="*80)
+    print("COMPUTING FEATURE IMPORTANCE (RANDOM FOREST + SHAP)")
+    print("="*80)
+
+    all_importance_data = []
+    all_features = sum(FEATURES.values(), [])
+
+    # Process each dataset × provider × prompt combination
+    for dataset in DATASETS:
+        for provider in PROVIDERS:
+            df = load_experiment_data(dataset, provider)
+            if df is None:
+                continue
+
+            print(f"\n{dataset.upper()} × {provider.upper()}")
+
+            for prompt in PROMPT_STYLES:
+                prompt_df = df[df['prompt_style'] == prompt]
+
+                if len(prompt_df) == 0:
+                    continue
+
+                # Split into pool and recommended
+                pool = prompt_df[prompt_df['selected'] == 0]
+                recommended = prompt_df[prompt_df['selected'] == 1]
+
+                # Skip if too imbalanced or too few samples
+                if len(pool) < 20 or len(recommended) < 20:
+                    continue
+
+                print(f"  {prompt:15s}: ", end='', flush=True)
+
+                # Prepare features
+                X, y, feature_names = prepare_ml_features(prompt_df, all_features)
+
+                # Skip if target is constant
+                if y.nunique() < 2 or len(X) < 50:
+                    print("⚠ Skipped (insufficient data)")
+                    continue
+
+                # Standardize features
+                scaler = StandardScaler()
+                X_scaled = scaler.fit_transform(X)
+
+                # Train Random Forest
+                rf = RandomForestClassifier(
+                    n_estimators=100,
+                    max_depth=10,
+                    min_samples_leaf=10,
+                    random_state=42,
+                    n_jobs=-1,
+                    class_weight='balanced'
+                )
+
+                try:
+                    rf.fit(X_scaled, y)
+
+                    # Get built-in feature importance
+                    rf_importance = rf.feature_importances_
+
+                    # Compute SHAP values
+                    explainer = shap.TreeExplainer(rf)
+                    shap_values = explainer.shap_values(X_scaled)
+
+                    # For binary classification, shap_values might be a list [class0, class1]
+                    if isinstance(shap_values, list):
+                        shap_values = shap_values[1]  # Use positive class
+
+                    # Aggregate SHAP importance (mean absolute SHAP value)
+                    shap_importance = np.abs(shap_values).mean(axis=0)
+
+                    # Compute AUROC
+                    y_pred_proba = rf.predict_proba(X_scaled)[:, 1]
+                    auroc = roc_auc_score(y, y_pred_proba)
+
+                    print(f"✓ AUROC: {auroc:.3f}")
+
+                    # Map feature names back to original features (aggregate one-hot encoded)
+                    # This is needed because we one-hot encoded categorical features
+                    feature_importance_dict = {}
+
+                    for orig_feat in all_features:
+                        if orig_feat not in prompt_df.columns:
+                            continue
+
+                        # Find all feature columns that start with this feature name
+                        matching_indices = [i for i, fn in enumerate(feature_names)
+                                          if fn == orig_feat or fn.startswith(f"{orig_feat}_")]
+
+                        if matching_indices:
+                            # Sum importance across all one-hot encoded columns
+                            feat_rf_importance = sum(rf_importance[i] for i in matching_indices)
+                            feat_shap_importance = sum(shap_importance[i] for i in matching_indices)
+
+                            feature_importance_dict[orig_feat] = {
+                                'rf_importance': feat_rf_importance,
+                                'shap_importance': feat_shap_importance
+                            }
+
+                    # Store results
+                    for feat, importance in feature_importance_dict.items():
+                        all_importance_data.append({
+                            'feature': feat,
+                            'dataset': dataset,
+                            'provider': provider,
+                            'prompt_style': prompt,
+                            'rf_importance': importance['rf_importance'],
+                            'shap_importance': importance['shap_importance'],
+                            'auroc': auroc,
+                            'n_samples': len(y),
+                            'n_positive': y.sum(),
+                            'n_negative': len(y) - y.sum()
+                        })
+
+                except Exception as e:
+                    print(f"✗ Error: {e}")
+                    continue
+
+    df_importance = pd.DataFrame(all_importance_data)
+    print(f"\n✓ Computed feature importance for {len(df_importance)} feature-condition combinations")
+    print(f"  Models trained: {df_importance[['dataset', 'provider', 'prompt_style']].drop_duplicates().shape[0]}")
+    print(f"  Mean AUROC: {df_importance.groupby(['dataset', 'provider', 'prompt_style'])['auroc'].first().mean():.3f}")
+
+    return df_importance
+
+
+def generate_feature_importance_heatmaps(df_importance):
+    """
+    Generate feature importance heatmaps at 4 aggregation levels:
+    1. Overall (all conditions)
+    2. By dataset (3 heatmaps)
+    3. By model (3 heatmaps)
+    4. By prompt style (6 heatmaps)
+    """
+    print("\n" + "="*80)
+    print("GENERATING FEATURE IMPORTANCE HEATMAPS")
+    print("="*80)
+
+    # Create output directory
+    importance_dir = VIZ_DIR / '5_feature_importance'
+    importance_dir.mkdir(exist_ok=True)
+
+    all_features = sum(FEATURES.values(), [])
+
+    # 1. OVERALL HEATMAP
+    print("\n1. Overall importance heatmap...")
+
+    # Aggregate across all conditions using both RF and SHAP importance
+    overall_rf_dict = df_importance.groupby('feature')['rf_importance'].mean().to_dict()
+    overall_shap_dict = df_importance.groupby('feature')['shap_importance'].mean().to_dict()
+
+    # Helper to convert to scalar
+    def to_scalar(val):
+        if isinstance(val, (list, np.ndarray)):
+            return float(np.mean(val))
+        return float(val)
+
+    # Fill in missing features with 0
+    overall_rf = pd.Series({f: to_scalar(overall_rf_dict.get(f, 0.0)) for f in all_features})
+    overall_shap = pd.Series({f: to_scalar(overall_shap_dict.get(f, 0.0)) for f in all_features})
+
+    # Create combined heatmap
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+
+    # RF importance
+    overall_rf_sorted = overall_rf.sort_values(ascending=False)
+    rf_median = float(overall_rf_sorted.median())
+    colors_rf = ['steelblue' if float(overall_rf_sorted.loc[f]) > rf_median else 'lightsteelblue'
+                 for f in overall_rf_sorted.index]
+    overall_rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
+    ax1.set_xlabel('Random Forest Feature Importance', fontweight='bold')
+    ax1.set_title('Random Forest Importance\n(Mean Decrease in Impurity)', fontweight='bold')
+    ax1.invert_yaxis()
+
+    # SHAP importance
+    overall_shap_sorted = overall_shap.sort_values(ascending=False)
+    shap_median = float(overall_shap_sorted.median())
+    colors_shap = ['darkseagreen' if float(overall_shap_sorted.loc[f]) > shap_median else 'lightgreen'
+                   for f in overall_shap_sorted.index]
+    overall_shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
+    ax2.set_xlabel('SHAP Feature Importance', fontweight='bold')
+    ax2.set_title('SHAP Importance\n(Mean |SHAP value|)', fontweight='bold')
+    ax2.invert_yaxis()
+
+    fig.suptitle('Feature Importance: Overall (All Conditions)', fontweight='bold', fontsize=14)
+    plt.tight_layout()
+    plt.savefig(importance_dir / 'importance_overall.png', bbox_inches='tight', dpi=300)
+    plt.close()
+    print(f"  ✓ Saved: importance_overall.png")
+
+    # 2. BY DATASET (3 heatmaps)
+    print("\n2. By dataset (3 heatmaps)...")
+    for dataset in DATASETS:
+        dataset_data = df_importance[df_importance['dataset'] == dataset]
+        if len(dataset_data) == 0:
+            continue
+
+        # Aggregate by feature
+        rf_dict = dataset_data.groupby('feature')['rf_importance'].mean().to_dict()
+        shap_dict = dataset_data.groupby('feature')['shap_importance'].mean().to_dict()
+        rf_scores = pd.Series({f: to_scalar(rf_dict.get(f, 0.0)) for f in all_features})
+        shap_scores = pd.Series({f: to_scalar(shap_dict.get(f, 0.0)) for f in all_features})
+
+        # Create combined heatmap
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+
+        rf_sorted = rf_scores.sort_values(ascending=False)
+        rf_med = float(rf_sorted.median())
+        colors_rf = ['steelblue' if float(rf_sorted.loc[f]) > rf_med else 'lightsteelblue'
+                     for f in rf_sorted.index]
+        rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
+        ax1.set_xlabel('RF Importance', fontweight='bold')
+        ax1.set_title('Random Forest', fontweight='bold')
+        ax1.invert_yaxis()
+
+        shap_sorted = shap_scores.sort_values(ascending=False)
+        shap_med = float(shap_sorted.median())
+        colors_shap = ['darkseagreen' if float(shap_sorted.loc[f]) > shap_med else 'lightgreen'
+                       for f in shap_sorted.index]
+        shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
+        ax2.set_xlabel('SHAP Importance', fontweight='bold')
+        ax2.set_title('SHAP Values', fontweight='bold')
+        ax2.invert_yaxis()
+
+        fig.suptitle(f'Feature Importance: {dataset.upper()}', fontweight='bold', fontsize=14)
+        plt.tight_layout()
+        plt.savefig(importance_dir / f'importance_by_dataset_{dataset}.png', bbox_inches='tight', dpi=300)
+        plt.close()
+        print(f"  ✓ Saved: importance_by_dataset_{dataset}.png")
+
+    # 3. BY MODEL (3 heatmaps)
+    print("\n3. By model (3 heatmaps)...")
+    for provider in PROVIDERS:
+        provider_data = df_importance[df_importance['provider'] == provider]
+        if len(provider_data) == 0:
+            continue
+
+        rf_dict = provider_data.groupby('feature')['rf_importance'].mean().to_dict()
+        shap_dict = provider_data.groupby('feature')['shap_importance'].mean().to_dict()
+        rf_scores = pd.Series({f: to_scalar(rf_dict.get(f, 0.0)) for f in all_features})
+        shap_scores = pd.Series({f: to_scalar(shap_dict.get(f, 0.0)) for f in all_features})
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+
+        rf_sorted = rf_scores.sort_values(ascending=False)
+        rf_med = float(rf_sorted.median())
+        colors_rf = ['steelblue' if float(rf_sorted.loc[f]) > rf_med else 'lightsteelblue'
+                     for f in rf_sorted.index]
+        rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
+        ax1.set_xlabel('RF Importance', fontweight='bold')
+        ax1.set_title('Random Forest', fontweight='bold')
+        ax1.invert_yaxis()
+
+        shap_sorted = shap_scores.sort_values(ascending=False)
+        shap_med = float(shap_sorted.median())
+        colors_shap = ['darkseagreen' if float(shap_sorted.loc[f]) > shap_med else 'lightgreen'
+                       for f in shap_sorted.index]
+        shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
+        ax2.set_xlabel('SHAP Importance', fontweight='bold')
+        ax2.set_title('SHAP Values', fontweight='bold')
+        ax2.invert_yaxis()
+
+        fig.suptitle(f'Feature Importance: {provider.upper()}', fontweight='bold', fontsize=14)
+        plt.tight_layout()
+        plt.savefig(importance_dir / f'importance_by_model_{provider}.png', bbox_inches='tight', dpi=300)
+        plt.close()
+        print(f"  ✓ Saved: importance_by_model_{provider}.png")
+
+    # 4. BY PROMPT STYLE (6 heatmaps)
+    print("\n4. By prompt style (6 heatmaps)...")
+    for prompt in PROMPT_STYLES:
+        prompt_data = df_importance[df_importance['prompt_style'] == prompt]
+        if len(prompt_data) == 0:
+            continue
+
+        rf_dict = prompt_data.groupby('feature')['rf_importance'].mean().to_dict()
+        shap_dict = prompt_data.groupby('feature')['shap_importance'].mean().to_dict()
+        rf_scores = pd.Series({f: to_scalar(rf_dict.get(f, 0.0)) for f in all_features})
+        shap_scores = pd.Series({f: to_scalar(shap_dict.get(f, 0.0)) for f in all_features})
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+
+        rf_sorted = rf_scores.sort_values(ascending=False)
+        rf_med = float(rf_sorted.median())
+        colors_rf = ['steelblue' if float(rf_sorted.loc[f]) > rf_med else 'lightsteelblue'
+                     for f in rf_sorted.index]
+        rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
+        ax1.set_xlabel('RF Importance', fontweight='bold')
+        ax1.set_title('Random Forest', fontweight='bold')
+        ax1.invert_yaxis()
+
+        shap_sorted = shap_scores.sort_values(ascending=False)
+        shap_med = float(shap_sorted.median())
+        colors_shap = ['darkseagreen' if float(shap_sorted.loc[f]) > shap_med else 'lightgreen'
+                       for f in shap_sorted.index]
+        shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
+        ax2.set_xlabel('SHAP Importance', fontweight='bold')
+        ax2.set_title('SHAP Values', fontweight='bold')
+        ax2.invert_yaxis()
+
+        fig.suptitle(f'Feature Importance: {prompt.upper()} Prompt', fontweight='bold', fontsize=14)
+        plt.tight_layout()
+        plt.savefig(importance_dir / f'importance_by_prompt_{prompt}.png', bbox_inches='tight', dpi=300)
+        plt.close()
+        print(f"  ✓ Saved: importance_by_prompt_{prompt}.png")
+
+    print(f"\n✓ Saved all feature importance heatmaps to {importance_dir}")
+
+
+# ============================================================================
+# 6. TOP 5 SIGNIFICANT FEATURES - ENHANCED
 # ============================================================================
 
 def generate_top5_significant(comp_df):
@@ -1628,10 +1984,11 @@ def main():
     print("\n" + "="*80)
     print("COMPREHENSIVE ANALYSIS PIPELINE - 16 CORE FEATURES")
     print("="*80)
-    print("\nGenerating 3 types of outputs:")
+    print("\nGenerating 4 types of outputs:")
     print("  1. Feature distributions")
     print("  2. Bias heatmaps (magnitude)")
-    print("  3. Directional bias plots (NEW - shows which categories are favored)")
+    print("  3. Directional bias plots (shows which categories are favored)")
+    print("  4. Feature importance analysis (NEW - Random Forest + SHAP)")
     print("\n" + "="*80)
 
     # 1. Feature distributions
@@ -1644,13 +2001,16 @@ def main():
     # 3. Bias heatmaps
     generate_bias_heatmaps(comp_df)
 
-    # 4. Directional bias plots (NEW)
+    # 4. Directional bias plots
     df_directional = compute_directional_bias()
     generate_directional_bias_plots(df_directional)
 
+    # 5. Feature importance analysis (NEW)
+    df_importance = compute_feature_importance()
+    generate_feature_importance_heatmaps(df_importance)
+
     # REMOVED sections (can be re-enabled later):
-    # 5. Top 5 significant features
-    # 6. Feature importance rankings
+    # 6. Top 5 significant features
     # 7. Regression tables
     # 8. Per-feature bias plots
 
@@ -1668,6 +2028,9 @@ def main():
     print(f"  3. Directional bias plots (16 plots) → {VIZ_DIR / '4_directional_bias'}")
     print(f"      ✓ Shows which categories/values are favored")
     print(f"      ✓ 1 plot per feature (6 subplots per prompt style)")
+    print(f"  4. Feature importance analysis (13 plots) → {VIZ_DIR / '5_feature_importance'}")
+    print(f"      ✓ Random Forest + SHAP values")
+    print(f"      ✓ Overall + by dataset (3) + by model (3) + by prompt (6)")
     print(f"\nAll outputs saved to: {VIZ_DIR}")
     print("\n" + "="*80)
     print("VERIFICATION COMPLETE - Ready for interpretation!")
