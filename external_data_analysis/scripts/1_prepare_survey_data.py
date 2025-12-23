@@ -18,7 +18,14 @@ import argparse
 from pathlib import Path
 import re
 import logging
-from textblob import TextBlob
+
+# Optional: TextBlob for sentiment (can skip if not installed)
+try:
+    from textblob import TextBlob
+    HAS_TEXTBLOB = True
+except ImportError:
+    HAS_TEXTBLOB = False
+    logging.warning("TextBlob not installed. Sentiment analysis will be skipped.")
 
 # ============================================================================
 # FEATURE TYPE DEFINITIONS
@@ -180,20 +187,26 @@ def extract_text_features(df):
 
 
 def extract_sentiment(df):
-    """Extract sentiment using TextBlob"""
+    """Extract sentiment using TextBlob (optional)"""
+    if not HAS_TEXTBLOB:
+        logging.warning("Skipping sentiment extraction (TextBlob not installed)")
+        df['sentiment_polarity'] = 0.0
+        df['sentiment_subjectivity'] = 0.0
+        return df
+
     logging.info("Computing sentiment (this may take a while)...")
-    
+
     def get_sentiment(text):
         try:
             blob = TextBlob(str(text))
             return blob.sentiment.polarity, blob.sentiment.subjectivity
         except:
             return 0.0, 0.0
-    
+
     sentiments = df['text'].apply(get_sentiment)
     df['sentiment_polarity'] = sentiments.apply(lambda x: x[0])
     df['sentiment_subjectivity'] = sentiments.apply(lambda x: x[1])
-    
+
     logging.info(f"  Computed sentiment for {len(df)} rows")
     return df
 

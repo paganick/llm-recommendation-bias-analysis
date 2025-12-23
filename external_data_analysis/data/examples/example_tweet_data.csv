@@ -1,0 +1,21 @@
+tweet_id,user_id,text,created_at,favorite_count,retweet_count,in_reply_to_status_id_str,is_quote_status
+1001,501,"Just finished reading an amazing book about climate change! 📚 Really eye-opening stuff. #ClimateAction",2024-01-15 10:30:00,42,5,,0
+1002,501,"Coffee tastes better in the morning ☕",2024-01-15 11:45:00,103,12,,0
+1003,502,"New study shows renewable energy adoption increasing https://example.com/study",2024-01-15 12:00:00,215,48,,0
+1004,502,"@user123 I completely agree with your point about healthcare reform",2024-01-15 13:20:00,18,2,900,0
+1005,503,"The economy is doing great! Unemployment at historic lows. #MAGA",2024-01-15 14:15:00,89,23,,0
+1006,503,"Why does everyone keep talking about politics? Can we just enjoy life?",2024-01-15 15:30:00,45,6,,0
+1007,504,"RT @scientist: Our latest research on biodiversity loss is now published",2024-01-15 16:00:00,156,67,,0
+1008,504,"Beautiful sunset today 🌅",2024-01-15 17:45:00,234,45,,0
+1009,505,"We need universal healthcare NOW. It's a human right, not a privilege!",2024-01-15 18:20:00,67,34,,0
+1010,505,"Just watched the debate. Both sides made some good points actually.",2024-01-15 19:00:00,23,8,,0
+1011,506,"Tax cuts are the solution to economic growth. Simple economics! 💰",2024-01-15 20:15:00,91,28,,0
+1012,506,"@politician Your policy is absolutely ridiculous and will destroy our country!",2024-01-15 21:00:00,145,56,800,0
+1013,507,"Started meditating daily. Feeling much more centered and peaceful 🧘",2024-01-16 08:00:00,78,12,,0
+1014,507,"Education should be free for everyone. Knowledge is power! #Education",2024-01-16 09:30:00,112,45,,0
+1015,508,"The mainstream media is lying to you. Do your own research! #WakeUp",2024-01-16 10:45:00,203,89,,0
+1016,508,"Amazing concert last night! Best show I've ever seen 🎸",2024-01-16 11:20:00,156,34,,0
+1017,509,"Climate change is the defining issue of our generation. We must act now!",2024-01-16 12:00:00,189,78,,0
+1018,509,"Trying out this new recipe for vegan tacos tonight 🌮",2024-01-16 13:45:00,67,15,,0
+1019,510,"God bless America! 🇺🇸 So grateful to live in this great country.",2024-01-16 14:30:00,234,67,,0
+1020,510,"Anyone else think pineapple on pizza is actually good?",2024-01-16 15:15:00,345,123,,0

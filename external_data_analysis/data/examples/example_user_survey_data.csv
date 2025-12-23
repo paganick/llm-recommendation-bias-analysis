@@ -1,0 +1,11 @@
+user_id,gender,age,education,partisanship,ideology,race,income,religiosity,marital_status,followers_count,friends_count,verified,statuses_count,created_at
+501,female,34,college,democrat,liberal,white,medium,not_religious,married,1250,580,0,3420,2018-03-15 10:00:00
+502,male,45,graduate,democrat,very_liberal,asian,high,somewhat_religious,married,3420,1200,1,8930,2016-07-22 14:30:00
+503,male,29,college,republican,conservative,white,medium,very_religious,single,890,420,0,2100,2019-01-10 09:15:00
+504,female,52,graduate,independent,moderate,white,high,not_religious,divorced,5670,2300,1,12450,2015-04-08 11:20:00
+505,female,28,college,democrat,liberal,hispanic,low,not_religious,single,2340,890,0,4560,2017-11-03 16:45:00
+506,male,38,high_school,republican,very_conservative,white,medium,very_religious,married,4560,1890,0,6780,2016-02-19 13:00:00
+507,female,41,graduate,democrat,moderate,black,medium,somewhat_religious,married,1890,670,0,3210,2018-09-27 10:30:00
+508,male,25,high_school,independent,conservative,white,low,not_religious,single,780,340,0,1560,2020-05-14 15:20:00
+509,female,31,college,democrat,very_liberal,white,medium,not_religious,single,3210,1450,0,5890,2017-06-12 12:00:00
+510,male,55,college,republican,conservative,white,high,very_religious,married,6780,3400,1,15670,2014-08-30 09:45:00
