@@ -1,0 +1,19 @@
+# Data files
+data/*.csv
+data/*.pkl
+!data/.gitkeep
+
+# API keys
+.env
+
+# Outputs
+outputs/
+!outputs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
