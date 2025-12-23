@@ -686,8 +686,8 @@ def generate_bias_heatmaps(comp_df):
                     annot_array[i, j] = f'{val:.3f}'
 
         fig, ax = plt.subplots(figsize=(14, 10))
-        sns.heatmap(pivot, annot=annot_array, fmt='', cmap='RdYlGn_r',
-                    center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+        sns.heatmap(pivot, annot=annot_array, fmt='', cmap='Reds',
+                    vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
         ax.set_title(f'Bias Heatmap (Normalized) - Prompt: {prompt}\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
         ax.set_xlabel('Dataset × Model')
         ax.set_ylabel('Feature')
@@ -736,8 +736,8 @@ def generate_bias_heatmaps(comp_df):
                 annot_dataset[i, j] = f'{val:.3f}'
 
     fig, ax = plt.subplots(figsize=(8, 10))
-    sns.heatmap(pivot_dataset, annot=annot_dataset, fmt='', cmap='RdYlGn_r',
-                center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+    sns.heatmap(pivot_dataset, annot=annot_dataset, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
     ax.set_title('Bias by Dataset (Aggregated across Models & Prompts)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'aggregated_by_dataset.png', bbox_inches='tight')
@@ -783,8 +783,8 @@ def generate_bias_heatmaps(comp_df):
                 annot_model[i, j] = f'{val:.3f}'
 
     fig, ax = plt.subplots(figsize=(8, 10))
-    sns.heatmap(pivot_model, annot=annot_model, fmt='', cmap='RdYlGn_r',
-                center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+    sns.heatmap(pivot_model, annot=annot_model, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
     ax.set_title('Bias by Model (Aggregated across Datasets & Prompts)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'aggregated_by_model.png', bbox_inches='tight')
@@ -830,8 +830,8 @@ def generate_bias_heatmaps(comp_df):
                 annot_prompt[i, j] = f'{val:.3f}'
 
     fig, ax = plt.subplots(figsize=(10, 10))
-    sns.heatmap(pivot_prompt, annot=annot_prompt, fmt='', cmap='RdYlGn_r',
-                center=0.5, vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+    sns.heatmap(pivot_prompt, annot=annot_prompt, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
     ax.set_title('Bias by Prompt Style (Aggregated across Datasets & Models)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
     plt.tight_layout()
     plt.savefig(HEATMAP_DIR / 'aggregated_by_prompt.png', bbox_inches='tight')
@@ -1176,7 +1176,7 @@ def prepare_ml_features(df: pd.DataFrame, all_features: list) -> tuple:
     Returns: X (feature matrix), y (target), feature_names (list)
     """
     # Separate numerical and categorical features
-    available_numerical = [f for f in all_features if f in df.columns and FEATURE_TYPES[f] == 'continuous']
+    available_numerical = [f for f in all_features if f in df.columns and FEATURE_TYPES[f] in ['numerical', 'binary']]
     available_categorical = [f for f in all_features if f in df.columns and FEATURE_TYPES[f] == 'categorical']
 
     # Start with numerical features
@@ -1300,8 +1300,9 @@ def compute_feature_importance():
 
                         if matching_indices:
                             # Sum importance across all one-hot encoded columns
-                            feat_rf_importance = sum(rf_importance[i] for i in matching_indices)
-                            feat_shap_importance = sum(shap_importance[i] for i in matching_indices)
+                            # Convert to float to ensure scalar values
+                            feat_rf_importance = float(np.sum([rf_importance[i] for i in matching_indices]))
+                            feat_shap_importance = float(np.sum([shap_importance[i] for i in matching_indices]))
 
                             feature_importance_dict[orig_feat] = {
                                 'rf_importance': feat_rf_importance,
@@ -1317,10 +1318,10 @@ def compute_feature_importance():
                             'prompt_style': prompt,
                             'rf_importance': importance['rf_importance'],
                             'shap_importance': importance['shap_importance'],
-                            'auroc': auroc,
-                            'n_samples': len(y),
-                            'n_positive': y.sum(),
-                            'n_negative': len(y) - y.sum()
+                            'auroc': float(auroc),
+                            'n_samples': int(len(y)),
+                            'n_positive': int(y.sum()),
+                            'n_negative': int(len(y) - y.sum())
                         })
 
                 except Exception as e:
@@ -1332,19 +1333,27 @@ def compute_feature_importance():
     print(f"  Models trained: {df_importance[['dataset', 'provider', 'prompt_style']].drop_duplicates().shape[0]}")
     print(f"  Mean AUROC: {df_importance.groupby(['dataset', 'provider', 'prompt_style'])['auroc'].first().mean():.3f}")
 
+    # Save the data for future use
+    importance_data_file = OUTPUT_DIR / 'feature_importance_data.csv'
+    df_importance.to_csv(importance_data_file, index=False)
+    print(f"  ✓ Saved feature importance data to {importance_data_file}")
+
     return df_importance
 
 
 def generate_feature_importance_heatmaps(df_importance):
     """
-    Generate feature importance heatmaps at 4 aggregation levels:
-    1. Overall (all conditions)
-    2. By dataset (3 heatmaps)
-    3. By model (3 heatmaps)
-    4. By prompt style (6 heatmaps)
+    Generate feature importance HEATMAPS matching bias evaluation structure:
+    1. Fully disaggregated (6 heatmaps, one per prompt) - features × (dataset × model)
+    2. Aggregated by dataset (1 heatmap) - features × dataset
+    3. Aggregated by model (1 heatmap) - features × model
+    4. Aggregated by prompt (1 heatmap) - features × prompt
+    5. Fully aggregated (1 heatmap) - features × "Overall"
+
+    Total: 10 heatmaps (matching bias structure)
     """
     print("\n" + "="*80)
-    print("GENERATING FEATURE IMPORTANCE HEATMAPS")
+    print("GENERATING FEATURE IMPORTANCE HEATMAPS (SHAP VALUES)")
     print("="*80)
 
     # Create output directory
@@ -1353,169 +1362,224 @@ def generate_feature_importance_heatmaps(df_importance):
 
     all_features = sum(FEATURES.values(), [])
 
-    # 1. OVERALL HEATMAP
-    print("\n1. Overall importance heatmap...")
+    # Use SHAP importance (more interpretable than RF importance)
+    # Normalize SHAP values within each feature for better visualization
+    df_norm = df_importance.copy()
 
-    # Aggregate across all conditions using both RF and SHAP importance
-    overall_rf_dict = df_importance.groupby('feature')['rf_importance'].mean().to_dict()
-    overall_shap_dict = df_importance.groupby('feature')['shap_importance'].mean().to_dict()
-
-    # Helper to convert to scalar
-    def to_scalar(val):
-        if isinstance(val, (list, np.ndarray)):
-            return float(np.mean(val))
-        return float(val)
-
-    # Fill in missing features with 0
-    overall_rf = pd.Series({f: to_scalar(overall_rf_dict.get(f, 0.0)) for f in all_features})
-    overall_shap = pd.Series({f: to_scalar(overall_shap_dict.get(f, 0.0)) for f in all_features})
-
-    # Create combined heatmap
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
-
-    # RF importance
-    overall_rf_sorted = overall_rf.sort_values(ascending=False)
-    rf_median = float(overall_rf_sorted.median())
-    colors_rf = ['steelblue' if float(overall_rf_sorted.loc[f]) > rf_median else 'lightsteelblue'
-                 for f in overall_rf_sorted.index]
-    overall_rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
-    ax1.set_xlabel('Random Forest Feature Importance', fontweight='bold')
-    ax1.set_title('Random Forest Importance\n(Mean Decrease in Impurity)', fontweight='bold')
-    ax1.invert_yaxis()
-
-    # SHAP importance
-    overall_shap_sorted = overall_shap.sort_values(ascending=False)
-    shap_median = float(overall_shap_sorted.median())
-    colors_shap = ['darkseagreen' if float(overall_shap_sorted.loc[f]) > shap_median else 'lightgreen'
-                   for f in overall_shap_sorted.index]
-    overall_shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
-    ax2.set_xlabel('SHAP Feature Importance', fontweight='bold')
-    ax2.set_title('SHAP Importance\n(Mean |SHAP value|)', fontweight='bold')
-    ax2.invert_yaxis()
-
-    fig.suptitle('Feature Importance: Overall (All Conditions)', fontweight='bold', fontsize=14)
-    plt.tight_layout()
-    plt.savefig(importance_dir / 'importance_overall.png', bbox_inches='tight', dpi=300)
-    plt.close()
-    print(f"  ✓ Saved: importance_overall.png")
-
-    # 2. BY DATASET (3 heatmaps)
-    print("\n2. By dataset (3 heatmaps)...")
-    for dataset in DATASETS:
-        dataset_data = df_importance[df_importance['dataset'] == dataset]
-        if len(dataset_data) == 0:
+    for feature in all_features:
+        feat_data = df_norm[df_norm['feature'] == feature]
+        if len(feat_data) == 0:
             continue
 
-        # Aggregate by feature
-        rf_dict = dataset_data.groupby('feature')['rf_importance'].mean().to_dict()
-        shap_dict = dataset_data.groupby('feature')['shap_importance'].mean().to_dict()
-        rf_scores = pd.Series({f: to_scalar(rf_dict.get(f, 0.0)) for f in all_features})
-        shap_scores = pd.Series({f: to_scalar(shap_dict.get(f, 0.0)) for f in all_features})
+        shap_vals = feat_data['shap_importance'].values
+        max_val = float(shap_vals.max())
+        min_val = float(shap_vals.min())
+        if max_val != min_val and max_val > 0:
+            normalized = (shap_vals - min_val) / (max_val - min_val)
+        else:
+            normalized = np.zeros_like(shap_vals)
 
-        # Create combined heatmap
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+        df_norm.loc[df_norm['feature'] == feature, 'shap_normalized'] = normalized
 
-        rf_sorted = rf_scores.sort_values(ascending=False)
-        rf_med = float(rf_sorted.median())
-        colors_rf = ['steelblue' if float(rf_sorted.loc[f]) > rf_med else 'lightsteelblue'
-                     for f in rf_sorted.index]
-        rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
-        ax1.set_xlabel('RF Importance', fontweight='bold')
-        ax1.set_title('Random Forest', fontweight='bold')
-        ax1.invert_yaxis()
-
-        shap_sorted = shap_scores.sort_values(ascending=False)
-        shap_med = float(shap_sorted.median())
-        colors_shap = ['darkseagreen' if float(shap_sorted.loc[f]) > shap_med else 'lightgreen'
-                       for f in shap_sorted.index]
-        shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
-        ax2.set_xlabel('SHAP Importance', fontweight='bold')
-        ax2.set_title('SHAP Values', fontweight='bold')
-        ax2.invert_yaxis()
-
-        fig.suptitle(f'Feature Importance: {dataset.upper()}', fontweight='bold', fontsize=14)
-        plt.tight_layout()
-        plt.savefig(importance_dir / f'importance_by_dataset_{dataset}.png', bbox_inches='tight', dpi=300)
-        plt.close()
-        print(f"  ✓ Saved: importance_by_dataset_{dataset}.png")
-
-    # 3. BY MODEL (3 heatmaps)
-    print("\n3. By model (3 heatmaps)...")
-    for provider in PROVIDERS:
-        provider_data = df_importance[df_importance['provider'] == provider]
-        if len(provider_data) == 0:
-            continue
-
-        rf_dict = provider_data.groupby('feature')['rf_importance'].mean().to_dict()
-        shap_dict = provider_data.groupby('feature')['shap_importance'].mean().to_dict()
-        rf_scores = pd.Series({f: to_scalar(rf_dict.get(f, 0.0)) for f in all_features})
-        shap_scores = pd.Series({f: to_scalar(shap_dict.get(f, 0.0)) for f in all_features})
-
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
-
-        rf_sorted = rf_scores.sort_values(ascending=False)
-        rf_med = float(rf_sorted.median())
-        colors_rf = ['steelblue' if float(rf_sorted.loc[f]) > rf_med else 'lightsteelblue'
-                     for f in rf_sorted.index]
-        rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
-        ax1.set_xlabel('RF Importance', fontweight='bold')
-        ax1.set_title('Random Forest', fontweight='bold')
-        ax1.invert_yaxis()
-
-        shap_sorted = shap_scores.sort_values(ascending=False)
-        shap_med = float(shap_sorted.median())
-        colors_shap = ['darkseagreen' if float(shap_sorted.loc[f]) > shap_med else 'lightgreen'
-                       for f in shap_sorted.index]
-        shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
-        ax2.set_xlabel('SHAP Importance', fontweight='bold')
-        ax2.set_title('SHAP Values', fontweight='bold')
-        ax2.invert_yaxis()
-
-        fig.suptitle(f'Feature Importance: {provider.upper()}', fontweight='bold', fontsize=14)
-        plt.tight_layout()
-        plt.savefig(importance_dir / f'importance_by_model_{provider}.png', bbox_inches='tight', dpi=300)
-        plt.close()
-        print(f"  ✓ Saved: importance_by_model_{provider}.png")
-
-    # 4. BY PROMPT STYLE (6 heatmaps)
-    print("\n4. By prompt style (6 heatmaps)...")
+    # 1. FULLY DISAGGREGATED: One heatmap per prompt style
     for prompt in PROMPT_STYLES:
-        prompt_data = df_importance[df_importance['prompt_style'] == prompt]
+        prompt_data = df_norm[df_norm['prompt_style'] == prompt]
+
         if len(prompt_data) == 0:
             continue
 
-        rf_dict = prompt_data.groupby('feature')['rf_importance'].mean().to_dict()
-        shap_dict = prompt_data.groupby('feature')['shap_importance'].mean().to_dict()
-        rf_scores = pd.Series({f: to_scalar(rf_dict.get(f, 0.0)) for f in all_features})
-        shap_scores = pd.Series({f: to_scalar(shap_dict.get(f, 0.0)) for f in all_features})
+        # Create pivot: features × (dataset × model)
+        pivot = prompt_data.pivot_table(
+            values='shap_normalized',
+            index='feature',
+            columns=['dataset', 'provider'],
+            aggfunc='mean'
+        )
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+        if pivot.empty:
+            continue
 
-        rf_sorted = rf_scores.sort_values(ascending=False)
-        rf_med = float(rf_sorted.median())
-        colors_rf = ['steelblue' if float(rf_sorted.loc[f]) > rf_med else 'lightsteelblue'
-                     for f in rf_sorted.index]
-        rf_sorted.plot(kind='barh', ax=ax1, color=colors_rf, edgecolor='black')
-        ax1.set_xlabel('RF Importance', fontweight='bold')
-        ax1.set_title('Random Forest', fontweight='bold')
-        ax1.invert_yaxis()
+        # Create annotations with actual SHAP values (not normalized)
+        pivot_raw = prompt_data.pivot_table(
+            values='shap_importance',
+            index='feature',
+            columns=['dataset', 'provider'],
+            aggfunc='mean'
+        )
 
-        shap_sorted = shap_scores.sort_values(ascending=False)
-        shap_med = float(shap_sorted.median())
-        colors_shap = ['darkseagreen' if float(shap_sorted.loc[f]) > shap_med else 'lightgreen'
-                       for f in shap_sorted.index]
-        shap_sorted.plot(kind='barh', ax=ax2, color=colors_shap, edgecolor='black')
-        ax2.set_xlabel('SHAP Importance', fontweight='bold')
-        ax2.set_title('SHAP Values', fontweight='bold')
-        ax2.invert_yaxis()
+        annot_array = np.empty_like(pivot, dtype=object)
+        for i in range(pivot.shape[0]):
+            for j in range(pivot.shape[1]):
+                val_raw = pivot_raw.iloc[i, j]
+                if pd.isna(val_raw):
+                    annot_array[i, j] = ''
+                else:
+                    annot_array[i, j] = f'{val_raw:.3f}'
 
-        fig.suptitle(f'Feature Importance: {prompt.upper()} Prompt', fontweight='bold', fontsize=14)
+        fig, ax = plt.subplots(figsize=(14, 10))
+        sns.heatmap(pivot, annot=annot_array, fmt='', cmap='Reds',
+                    vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized SHAP Importance'})
+        ax.set_title(f'Feature Importance (SHAP) - Prompt: {prompt}\n(Normalized within feature, annotations show raw values)',
+                     fontweight='bold')
+        ax.set_xlabel('Dataset × Model')
+        ax.set_ylabel('Feature')
         plt.tight_layout()
-        plt.savefig(importance_dir / f'importance_by_prompt_{prompt}.png', bbox_inches='tight', dpi=300)
+        plt.savefig(importance_dir / f'disaggregated_prompt_{prompt}.png', bbox_inches='tight', dpi=300)
         plt.close()
-        print(f"  ✓ Saved: importance_by_prompt_{prompt}.png")
 
-    print(f"\n✓ Saved all feature importance heatmaps to {importance_dir}")
+    print("  ✓ Fully disaggregated heatmaps (by prompt style)")
+
+    # 2. AGGREGATED BY DATASET
+    agg_dataset = df_norm.groupby(['feature', 'dataset']).agg({
+        'shap_normalized': 'mean',
+        'shap_importance': 'mean'
+    }).reset_index()
+
+    pivot_dataset = agg_dataset.pivot_table(
+        values='shap_normalized',
+        index='feature',
+        columns='dataset',
+        aggfunc='mean'
+    )
+
+    pivot_dataset_raw = agg_dataset.pivot_table(
+        values='shap_importance',
+        index='feature',
+        columns='dataset',
+        aggfunc='mean'
+    )
+
+    annot_dataset = np.empty_like(pivot_dataset, dtype=object)
+    for i in range(pivot_dataset.shape[0]):
+        for j in range(pivot_dataset.shape[1]):
+            val_raw = pivot_dataset_raw.iloc[i, j]
+            if pd.isna(val_raw):
+                annot_dataset[i, j] = ''
+            else:
+                annot_dataset[i, j] = f'{val_raw:.3f}'
+
+    fig, ax = plt.subplots(figsize=(8, 10))
+    sns.heatmap(pivot_dataset, annot=annot_dataset, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized SHAP Importance'})
+    ax.set_title('Feature Importance by Dataset\n(Aggregated across Models & Prompts)', fontweight='bold')
+    ax.set_xlabel('Dataset')
+    ax.set_ylabel('Feature')
+    plt.tight_layout()
+    plt.savefig(importance_dir / 'aggregated_by_dataset.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+    print("  ✓ Aggregated by dataset")
+
+    # 3. AGGREGATED BY MODEL
+    agg_model = df_norm.groupby(['feature', 'provider']).agg({
+        'shap_normalized': 'mean',
+        'shap_importance': 'mean'
+    }).reset_index()
+
+    pivot_model = agg_model.pivot_table(
+        values='shap_normalized',
+        index='feature',
+        columns='provider',
+        aggfunc='mean'
+    )
+
+    pivot_model_raw = agg_model.pivot_table(
+        values='shap_importance',
+        index='feature',
+        columns='provider',
+        aggfunc='mean'
+    )
+
+    annot_model = np.empty_like(pivot_model, dtype=object)
+    for i in range(pivot_model.shape[0]):
+        for j in range(pivot_model.shape[1]):
+            val_raw = pivot_model_raw.iloc[i, j]
+            if pd.isna(val_raw):
+                annot_model[i, j] = ''
+            else:
+                annot_model[i, j] = f'{val_raw:.3f}'
+
+    fig, ax = plt.subplots(figsize=(8, 10))
+    sns.heatmap(pivot_model, annot=annot_model, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized SHAP Importance'})
+    ax.set_title('Feature Importance by Model\n(Aggregated across Datasets & Prompts)', fontweight='bold')
+    ax.set_xlabel('Model')
+    ax.set_ylabel('Feature')
+    plt.tight_layout()
+    plt.savefig(importance_dir / 'aggregated_by_model.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+    print("  ✓ Aggregated by model")
+
+    # 4. AGGREGATED BY PROMPT
+    agg_prompt = df_norm.groupby(['feature', 'prompt_style']).agg({
+        'shap_normalized': 'mean',
+        'shap_importance': 'mean'
+    }).reset_index()
+
+    pivot_prompt = agg_prompt.pivot_table(
+        values='shap_normalized',
+        index='feature',
+        columns='prompt_style',
+        aggfunc='mean'
+    )
+
+    pivot_prompt_raw = agg_prompt.pivot_table(
+        values='shap_importance',
+        index='feature',
+        columns='prompt_style',
+        aggfunc='mean'
+    )
+
+    annot_prompt = np.empty_like(pivot_prompt, dtype=object)
+    for i in range(pivot_prompt.shape[0]):
+        for j in range(pivot_prompt.shape[1]):
+            val_raw = pivot_prompt_raw.iloc[i, j]
+            if pd.isna(val_raw):
+                annot_prompt[i, j] = ''
+            else:
+                annot_prompt[i, j] = f'{val_raw:.3f}'
+
+    fig, ax = plt.subplots(figsize=(12, 10))
+    sns.heatmap(pivot_prompt, annot=annot_prompt, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized SHAP Importance'})
+    ax.set_title('Feature Importance by Prompt Style\n(Aggregated across Datasets & Models)', fontweight='bold')
+    ax.set_xlabel('Prompt Style')
+    ax.set_ylabel('Feature')
+    plt.tight_layout()
+    plt.savefig(importance_dir / 'aggregated_by_prompt.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+    print("  ✓ Aggregated by prompt style")
+
+    # 5. FULLY AGGREGATED
+    agg_all = df_norm.groupby('feature').agg({
+        'shap_normalized': 'mean',
+        'shap_importance': 'mean'
+    }).reset_index()
+
+    # Create a single-column heatmap
+    pivot_all = agg_all.set_index('feature')[['shap_normalized']]
+    pivot_all.columns = ['Overall']
+
+    pivot_all_raw = agg_all.set_index('feature')[['shap_importance']]
+
+    annot_all = np.array([[f'{pivot_all_raw.loc[feat, "shap_importance"]:.3f}']
+                          for feat in pivot_all.index])
+
+    fig, ax = plt.subplots(figsize=(6, 10))
+    sns.heatmap(pivot_all, annot=annot_all, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized SHAP Importance'})
+    ax.set_title('Feature Importance: Overall\n(Aggregated across All Conditions)', fontweight='bold')
+    ax.set_xlabel('')
+    ax.set_ylabel('Feature')
+    plt.tight_layout()
+    plt.savefig(importance_dir / 'fully_aggregated.png', bbox_inches='tight', dpi=300)
+    plt.close()
+
+    print("  ✓ Fully aggregated")
+
+    print(f"\n✓ Saved all 10 feature importance heatmaps to {importance_dir}")
 
 
 # ============================================================================
@@ -2006,7 +2070,18 @@ def main():
     generate_directional_bias_plots(df_directional)
 
     # 5. Feature importance analysis (NEW)
-    df_importance = compute_feature_importance()
+    # Check if pre-computed data exists
+    importance_data_file = OUTPUT_DIR / 'feature_importance_data.csv'
+    if importance_data_file.exists():
+        print("\n" + "="*80)
+        print("LOADING PRE-COMPUTED FEATURE IMPORTANCE DATA")
+        print("="*80)
+        df_importance = pd.read_csv(importance_data_file)
+        print(f"✓ Loaded {len(df_importance)} feature-condition combinations from cache")
+        print(f"  To recompute, delete: {importance_data_file}")
+    else:
+        df_importance = compute_feature_importance()
+
     generate_feature_importance_heatmaps(df_importance)
 
     # REMOVED sections (can be re-enabled later):
@@ -2028,9 +2103,10 @@ def main():
     print(f"  3. Directional bias plots (16 plots) → {VIZ_DIR / '4_directional_bias'}")
     print(f"      ✓ Shows which categories/values are favored")
     print(f"      ✓ 1 plot per feature (6 subplots per prompt style)")
-    print(f"  4. Feature importance analysis (13 plots) → {VIZ_DIR / '5_feature_importance'}")
-    print(f"      ✓ Random Forest + SHAP values")
-    print(f"      ✓ Overall + by dataset (3) + by model (3) + by prompt (6)")
+    print(f"  4. Feature importance heatmaps (10 plots) → {VIZ_DIR / '5_feature_importance'}")
+    print(f"      ✓ SHAP values (normalized within feature)")
+    print(f"      ✓ Structure matches bias heatmaps:")
+    print(f"        - Disaggregated by prompt (6) + By dataset (1) + By model (1) + By prompt (1) + Overall (1)")
     print(f"\nAll outputs saved to: {VIZ_DIR}")
     print("\n" + "="*80)
     print("VERIFICATION COMPLETE - Ready for interpretation!")
