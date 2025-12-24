@@ -18,19 +18,22 @@ from pathlib import Path
 import logging
 import os
 import time
+import sys
 from dotenv import load_dotenv
+
+# Add parent directory to path to import from main codebase
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Load environment variables
 load_dotenv()
 
-# Import LLM clients
+# Import LLM client from main codebase
 try:
-    import openai
-    from anthropic import Anthropic
-    import google.generativeai as genai
-except ImportError as e:
-    print(f"Warning: Some LLM libraries not installed: {e}")
-    print("Install with: pip install openai anthropic google-generativeai")
+    from utils.llm_client import get_llm_client
+    USE_MAIN_CLIENT = True
+except ImportError:
+    print("Warning: Could not import main LLM client. Using fallback...")
+    USE_MAIN_CLIENT = False
 
 PROMPT_STYLES = {
     'general': "Recommend posts that would be most interesting to a general audience.",
@@ -51,66 +54,26 @@ def setup_logging():
         ]
     )
 
-def get_api_client(provider):
+def get_api_client(provider, model):
     """Initialize API client"""
-    if provider == 'openai':
-        api_key = os.getenv('OPENAI_API_KEY')
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY not found in .env file")
-        openai.api_key = api_key
-        return 'openai'
-    elif provider == 'anthropic':
-        api_key = os.getenv('ANTHROPIC_API_KEY')
-        if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY not found in .env file")
-        return Anthropic(api_key=api_key)
-    elif provider == 'gemini':
-        api_key = os.getenv('GOOGLE_API_KEY')
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY not found in .env file")
-        genai.configure(api_key=api_key)
-        return 'gemini'
+    if USE_MAIN_CLIENT:
+        # Use the robust client from main codebase
+        return get_llm_client(provider, model)
     else:
-        raise ValueError(f"Unknown provider: {provider}")
+        raise ImportError("Main LLM client not available. Cannot proceed.")
 
 def call_llm(client, provider, model, prompt, max_retries=3):
     """Call LLM API with retries"""
-    for attempt in range(max_retries):
-        try:
-            if provider == 'openai':
-                response = openai.chat.completions.create(
-                    model=model,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.7,
-                    max_tokens=50
-                )
-                return response.choices[0].message.content.strip()
-            
-            elif provider == 'anthropic':
-                response = client.messages.create(
-                    model=model,
-                    max_tokens=50,
-                    messages=[{"role": "user", "content": prompt}]
-                )
-                return response.content[0].text.strip()
-            
-            elif provider == 'gemini':
-                model_obj = genai.GenerativeModel(model)
-                response = model_obj.generate_content(prompt)
-                return response.text.strip()
-                
-        except Exception as e:
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt
-                logging.warning(f"API error (attempt {attempt + 1}): {e}. Retrying in {wait_time}s...")
-                time.sleep(wait_time)
-            else:
-                raise
+    if USE_MAIN_CLIENT:
+        # Main client already has retry logic built in
+        return client.generate(prompt, max_tokens=100)
+    else:
+        raise ImportError("Main LLM client not available. Cannot proceed.")
 
 def run_experiment(df, provider, model, output_dir, n_trials=100, pool_size=10, delay=0.5):
     """Run recommendation experiment"""
-    
-    client = get_api_client(provider)
+
+    client = get_api_client(provider, model)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
