@@ -1,8 +1,10 @@
 # How to Run Complete Analysis on Survey Data
 
+> **Note**: This repository includes fake/test data for demonstration purposes. Follow the instructions below to analyze your real survey data.
+
 ## Quick Start
 
-Your collaborator needs to run just 3 commands to get all outputs:
+Run just 3 commands to get complete analysis with 87 visualizations:
 
 ### 1. Prepare Survey Data
 ```bash
@@ -12,6 +14,8 @@ python scripts/1_prepare_survey_data.py \
   --users path/to/user_survey_data.csv \
   --output data/prepared_posts.csv
 ```
+
+**Replace paths** with your actual survey data files.
 
 ### 2. Run Recommendations
 ```bash
@@ -26,37 +30,43 @@ python scripts/2_run_recommendations.py \
 
 ### 3. Run Complete Analysis
 ```bash
-bash scripts/run_full_survey_analysis_simple.sh
+bash scripts/run_full_survey_analysis.sh
 ```
 
 **That's it!** All outputs will be in `outputs/analysis_full/`
 
 ## What Gets Generated
 
-### Complete Output Structure
+### Complete Output Structure (87 Visualizations)
 ```
 external_data_analysis/outputs/analysis_full/
 ├── visualizations/
-│   ├── 1_distributions/          # One plot per feature (16 plots for core features + extras)
-│   ├── 3_bias_heatmaps/          # 10 heatmaps
+│   ├── 1_distributions/          # Distribution plots (pool vs selected)
+│   │                             # One plot per feature (34 in test data)
+│   ├── 2_bias_heatmaps/          # 10 bias heatmaps
 │   │   ├── disaggregated_prompt_*.png (6 heatmaps, one per prompt)
 │   │   ├── aggregated_by_dataset.png
 │   │   ├── aggregated_by_model.png
 │   │   ├── aggregated_by_prompt.png
 │   │   └── fully_aggregated.png
-│   ├── 4_directional_bias/       # One plot per feature showing which categories favored
-│   └── 5_feature_importance/     # 10 heatmaps (structure matches bias)
+│   ├── 3_directional_bias/       # Directional bias heatmaps
+│   │                             # One per feature showing which categories are over/under-represented
+│   └── 4_feature_importance/     # 10 feature importance heatmaps
 │       ├── disaggregated_prompt_*.png (6 heatmaps)
 │       ├── aggregated_by_dataset.png
 │       ├── aggregated_by_model.png
 │       ├── aggregated_by_prompt.png
 │       └── fully_aggregated.png
-└── [CSV data files]
 ```
 
-### Heatmap Details
+### Visualization Details
 
-#### 10 Bias Heatmaps
+#### Distribution Plots (1_distributions/)
+- **What**: Side-by-side comparison of feature distributions (Pool vs Selected)
+- **Format**: Bar charts for categorical, histograms for numerical
+- **Count**: One plot per feature auto-detected from your data
+
+#### 10 Bias Heatmaps (2_bias_heatmaps/)
 Show **magnitude** of bias for each feature:
 
 1. **Disaggregated by prompt** (6 heatmaps):
@@ -84,10 +94,20 @@ Show **magnitude** of bias for each feature:
    - Single column showing overall bias per feature
    - Easiest way to see which features have most bias overall
 
-#### 10 Feature Importance Heatmaps
-Same structure as bias heatmaps, but showing **predictive importance** (SHAP values):
+#### Directional Bias Heatmaps (3_directional_bias/)
+- **What**: Shows WHICH categories/values are favored (not just magnitude)
+- **Format**: Heatmaps with rows = categories, columns = prompt styles
+- **Colors**:
+  - Red/Positive = Over-represented in recommendations
+  - Blue/Negative = Under-represented in recommendations
+  - White/Zero = No directional bias
+- **Example**: If gender shows bias of 0.15, directional plot reveals if it favors males, females, or non-binary
+
+#### 10 Feature Importance Heatmaps (4_feature_importance/)
+Same structure as bias heatmaps, but showing **predictive importance**:
 - Which features best predict whether a post gets recommended?
 - Same 5 aggregation levels as bias heatmaps
+- Helps focus analysis on most influential features
 
 ## Multiple Models/Providers
 
@@ -100,14 +120,14 @@ python scripts/2_run_recommendations.py --provider openai ...
 python scripts/2_run_recommendations.py --provider anthropic ...
 
 # Analysis automatically processes all three
-bash scripts/run_full_survey_analysis_simple.sh
+bash scripts/run_full_survey_analysis.sh
 ```
 
 The heatmaps will then show comparisons across all 3 models!
 
 ## Output Interpretation
 
-### Bias Heatmaps (3_bias_heatmaps/)
+### Bias Heatmaps (2_bias_heatmaps/)
 **Color**: White (no bias) → Red (strong bias)
 
 **Values**:
@@ -116,28 +136,22 @@ The heatmaps will then show comparisons across all 3 models!
 
 **Interpretation**:
 - < 0.10: Negligible bias
-- 0.10-0.30: Small bias  
+- 0.10-0.30: Small bias
 - 0.30-0.50: Medium bias
 - > 0.50: Large bias
 
-**Markers**:
-- `*`: p < 0.05 and bias > 50th percentile
-- `**`: p < 0.05 and bias > 60th percentile
-- `***`: p < 0.05 and bias > 75th percentile
+### Directional Bias (3_directional_bias/)
+**Values**: Difference in proportions/means (Selected - Pool)
 
-### Directional Bias (4_directional_bias/)
-Shows WHICH categories are favored (not just magnitude)
+**Interpretation**:
+- Positive (red): Category/value is over-represented in recommendations
+- Negative (blue): Category/value is under-represented
+- Zero (white): No directional bias
 
-**Colors**:
-- Red: Over-represented in recommendations
-- Blue: Under-represented in recommendations
-
-**Example**: If gender bias heatmap shows 0.15 (small bias), look at directional plot to see if it's favoring males, females, or non-binary authors.
-
-### Feature Importance (5_feature_importance/)
+### Feature Importance (4_feature_importance/)
 Shows which features drive recommendation decisions
 
-**Values**: SHAP importance (normalized within each feature, 0-1)
+**Values**: Statistical importance measures
 
 **Interpretation**:
 - High values = Feature strongly influences which posts get recommended
@@ -152,10 +166,20 @@ Shows which features drive recommendation decisions
 | Datasets | 3 (Twitter, Bluesky, Reddit) | 1 (Survey) - but can be multiple sources |
 | Models | 3 (OpenAI, Anthropic, Gemini) | 1+ (whatever you run) |
 | Features | 16 core features | Auto-detects ALL features in data |
-| Heatmaps | 20 total (10 bias + 10 importance) | 20 total (same structure) |
+| Visualizations | ~87 total | ~87 total (matching structure) |
 | Disaggregation | Dataset × Model × Prompt | Model × Prompt (single dataset) |
 
 The survey analysis produces **identical output structure** to your main experiments!
+
+## Test/Fake Data
+
+The repository includes test data for demonstration:
+- **Location**: `outputs/experiments/survey_gemini_gemini-2.0-flash/`
+- **Status**: ⚠️ **FAKE DATA** - generated for testing only
+- **Purpose**: Demonstrates the pipeline and expected output structure
+- **Usage**: Replace with your real survey data to get actual results
+
+Test outputs in `outputs/analysis_full/` are also based on fake data.
 
 ## Troubleshooting
 
@@ -166,10 +190,14 @@ The survey analysis produces **identical output structure** to your main experim
 **Cause**: Only 1 model/provider analyzed
 **Solution**: Run recommendations with multiple providers to enable cross-model comparison
 
+### Fewer features than expected
+**Check**: Ensure your survey data has all expected columns
+**Note**: Script auto-detects features - if columns are missing, they won't appear
+
 ### Analysis is slow
-**Cause**: Feature importance computation (Random Forest + SHAP) is intensive
 **Expected**: 2-5 minutes for typical survey data
-**To speed up**: Results are cached - subsequent runs are instant
+**First run**: Computes all metrics from scratch
+**Subsequent runs**: Previous directory is cleaned, so each run takes the same time
 
 ## Advanced: Custom Features
 
@@ -178,10 +206,10 @@ The analysis auto-detects features, but you can customize in `scripts/1_prepare_
 ```python
 # Add custom feature extraction
 df['custom_metric'] = your_function(df['text'])
-FEATURE_TYPES['custom_metric'] = 'numerical'  # or 'categorical'
+FEATURE_TYPES['custom_metric'] = 'numerical'  # or 'categorical' or 'binary'
 ```
 
-The heatmaps will automatically include your custom features!
+The analysis will automatically include your custom features in all visualizations!
 
 ---
 
