@@ -115,16 +115,125 @@ PROMPT_STYLES = ['general', 'popular', 'engaging', 'informative', 'controversial
 OUTPUT_DIR = Path('analysis_outputs')
 VIZ_DIR = OUTPUT_DIR / 'visualizations'
 DIST_DIR = VIZ_DIR / '1_distributions'
-COMPARE_DIR = VIZ_DIR / '2_pool_vs_recommended'
-COMPARE_AGG_DIR = COMPARE_DIR / 'aggregated'  # NEW: Aggregated plots
-HEATMAP_DIR = VIZ_DIR / '3_bias_heatmaps'
-TOP5_DIR = VIZ_DIR / '4_top5_significant'
-IMPORTANCE_DIR = VIZ_DIR / '5_feature_importance'
+HEATMAP_DIR = VIZ_DIR / '2_bias_heatmaps'
+DIR_BIAS_DIR = VIZ_DIR / '3_directional_bias'
+IMPORTANCE_DIR = VIZ_DIR / '4_feature_importance'
+COMPARE_DIR = VIZ_DIR / '_archive_pool_vs_recommended'
+COMPARE_AGG_DIR = COMPARE_DIR / 'aggregated'
+TOP5_DIR = VIZ_DIR / '_archive_top5_significant'
 TABLES_DIR = OUTPUT_DIR / '6_regression_tables'
 
 # Create all directories
-for d in [VIZ_DIR, DIST_DIR, COMPARE_DIR, COMPARE_AGG_DIR, HEATMAP_DIR, TOP5_DIR, IMPORTANCE_DIR, TABLES_DIR]:
+for d in [VIZ_DIR, DIST_DIR, HEATMAP_DIR, DIR_BIAS_DIR, IMPORTANCE_DIR, COMPARE_DIR, COMPARE_AGG_DIR, TOP5_DIR, TABLES_DIR]:
     d.mkdir(parents=True, exist_ok=True)
+
+# ============================================================================
+# ENHANCED VISUALIZATION SETTINGS
+# ============================================================================
+
+# Dataset color palette (consistent across all plots)
+DATASET_COLORS = {
+    'twitter': '#2F2F2F',      # Dark gray/blackish for Twitter/X
+    'bluesky': '#4A90E2',      # Blue for Bluesky
+    'reddit': '#FF6B35'        # Orange-red for Reddit
+}
+
+# Dataset display names
+DATASET_LABELS = {
+    'twitter': 'Twitter/X',
+    'bluesky': 'Bluesky',
+    'reddit': 'Reddit'
+}
+
+# Enhanced color schemes for different plot types
+# Using perceptually distinct colors (avoiding simple red/green)
+DIVERGING_CMAP = 'RdYlBu_r'  # Red-Yellow-Blue (more interesting than red-green)
+SEQUENTIAL_CMAP = 'viridis'   # Perceptually uniform colormap
+CATEGORICAL_CMAP = 'Set3'     # For categorical features
+
+# Directional bias colors (replacing simple red/green)
+DIRECTIONAL_COLORS = {
+    'negative': '#D55E00',  # Vermillion (colorblind-friendly)
+    'positive': '#009E73',  # Bluish green (colorblind-friendly)
+    'neutral': '#999999'    # Gray
+}
+
+# Feature type order for heatmap rows (grouped by type)
+FEATURE_TYPE_ORDER = (
+    # Author features (demographics)
+    FEATURES['author'] +
+    # Text metrics
+    FEATURES['text_metrics'] +
+    # Content features
+    FEATURES['content'] +
+    # Sentiment features
+    FEATURES['sentiment'] +
+    # Style features (binary indicators)
+    FEATURES['style'] +
+    # Toxicity features
+    FEATURES['toxicity']
+)
+
+# Feature display names (human-readable, no underscores)
+FEATURE_DISPLAY_NAMES = {
+    # Author features
+    'author_gender': 'Author: Gender',
+    'author_political_leaning': 'Author: Political Leaning',
+    'author_is_minority': 'Author: Is Minority',
+    # Text metrics
+    'text_length': 'Text: Length (chars)',
+    'avg_word_length': 'Text: Avg Word Length',
+    # Content features
+    'polarization_score': 'Content: Polarization Score',
+    'controversy_level': 'Content: Controversy Level',
+    'primary_topic': 'Content: Primary Topic',
+    # Sentiment features
+    'sentiment_polarity': 'Sentiment: Polarity',
+    'sentiment_subjectivity': 'Sentiment: Subjectivity',
+    # Style features (binary)
+    'has_emoji': 'Style: Has Emoji',
+    'has_hashtag': 'Style: Has Hashtag',
+    'has_mention': 'Style: Has Mention',
+    'has_url': 'Style: Has URL',
+    # Toxicity features
+    'toxicity': 'Toxicity: Score',
+    'severe_toxicity': 'Toxicity: Severe Score'
+}
+
+def format_feature_name(feature_name):
+    """Convert feature name to human-readable format."""
+    return FEATURE_DISPLAY_NAMES.get(feature_name, feature_name.replace('_', ' ').title())
+
+def get_feature_category(feature_name):
+    """Get the category label for a feature."""
+    for category, features in FEATURES.items():
+        if feature_name in features:
+            return category.replace('_', ' ').title()
+    return 'Other'
+
+def get_dataset_color(dataset_name):
+    """Get consistent color for a dataset."""
+    return DATASET_COLORS.get(dataset_name, '#666666')
+
+def get_dataset_label(dataset_name):
+    """Get display label for a dataset."""
+    return DATASET_LABELS.get(dataset_name, dataset_name.title())
+
+def get_directional_color(value):
+    """Get color for directional bias value."""
+    if value < -0.01:
+        return DIRECTIONAL_COLORS['negative']
+    elif value > 0.01:
+        return DIRECTIONAL_COLORS['positive']
+    else:
+        return DIRECTIONAL_COLORS['neutral']
+
+def sort_features_by_type(features_list):
+    """Sort features by their type (author, text, content, etc.)."""
+    return sorted(features_list, key=lambda x: (
+        FEATURE_TYPE_ORDER.index(x) if x in FEATURE_TYPE_ORDER else 999,
+        x
+    ))
 
 # ============================================================================
 # UTILITY FUNCTIONS
@@ -296,31 +405,32 @@ def generate_feature_distributions():
 def plot_numerical_distribution(pools, feature):
     """Plot numerical feature with improved styling"""
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-    fig.suptitle(f'{feature}', fontsize=14, fontweight='bold')
+    fig.suptitle(format_feature_name(feature), fontsize=14, fontweight='bold')
 
     for idx, (dataset, pool) in enumerate(pools.items()):
         ax = axes[idx]
         values = pd.to_numeric(pool[feature], errors='coerce').dropna()
 
         if len(values) > 0 and values.std() > 0:
-            # Use color from palette
-            ax.hist(values, bins=50, alpha=0.7, color=f'C{idx}', edgecolor='black')
-            ax.axvline(values.mean(), color='red', linestyle='--', linewidth=2,
+            # Use dataset-specific colors
+            color = get_dataset_color(dataset)
+            ax.hist(values, bins=50, alpha=0.7, color=color, edgecolor='black')
+            ax.axvline(values.mean(), color='#E74C3C', linestyle='--', linewidth=2,
                       label=f'Mean: {values.mean():.3f}')
-            ax.axvline(values.median(), color='orange', linestyle='--', linewidth=2,
+            ax.axvline(values.median(), color='#F39C12', linestyle='--', linewidth=2,
                       label=f'Median: {values.median():.3f}')
             ax.set_xlabel('Value')
             ax.set_ylabel('Frequency')
-            ax.set_title(f'{dataset.capitalize()} (n={len(values):,})')
+            ax.set_title(f'{get_dataset_label(dataset)} (n={len(values):,})')
             ax.legend()
             ax.grid(True, alpha=0.3)
         elif len(values) > 0:
             ax.text(0.5, 0.5, f'No variation\n(all values = {values.iloc[0]:.3f})',
                    ha='center', va='center', transform=ax.transAxes)
-            ax.set_title(f'{dataset.capitalize()} (n={len(values):,})')
+            ax.set_title(f'{get_dataset_label(dataset)} (n={len(values):,})')
         else:
             ax.text(0.5, 0.5, 'No data', ha='center', va='center', transform=ax.transAxes)
-            ax.set_title(f'{dataset.capitalize()}')
+            ax.set_title(f'{get_dataset_label(dataset)}')
 
     plt.tight_layout()
     plt.savefig(DIST_DIR / f'{feature}_distribution.png', bbox_inches='tight')
@@ -425,6 +535,15 @@ def generate_pool_vs_recommended():
     print("GENERATING POOL VS RECOMMENDED COMPARISONS - AGGREGATED")
     print("="*80)
 
+    # Check if comparison data already exists
+    comp_data_file = OUTPUT_DIR / 'comparison_data.parquet'
+    if comp_data_file.exists():
+        print("\n✓ Loading cached comparison data...")
+        comp_df = pd.read_parquet(comp_data_file)
+        print(f"  Loaded {len(comp_df)} comparisons from cache")
+        print(f"  To recompute, delete: {comp_data_file}\n")
+        return comp_df
+
     all_features = sum(FEATURES.values(), [])
     comparisons = []
 
@@ -473,8 +592,9 @@ def generate_pool_vs_recommended():
     print("\n2. Saving comparison summary (skipping plot generation)...")
     comp_df = pd.DataFrame(comparisons)
 
-    # Save full summary
+    # Save full summary (both CSV and Parquet for fast loading)
     comp_df.to_csv(OUTPUT_DIR / 'pool_vs_recommended_summary.csv', index=False)
+    comp_df.to_parquet(OUTPUT_DIR / 'comparison_data.parquet', index=False)
 
     # SKIP: Generate aggregated plots (not needed for now)
     # generate_aggregated_comparisons_enhanced(comp_df)
@@ -633,6 +753,12 @@ def generate_bias_heatmaps(comp_df):
     print("="*80)
 
     all_features = sum(FEATURES.values(), [])
+
+    # Create reverse mapping from feature to category
+    feature_to_category = {}
+    for category, features in FEATURES.items():
+        for feature in features:
+            feature_to_category[feature] = category
 
     # Normalize bias values within each feature (min-max scaling)
     comp_df_norm = comp_df.copy()
@@ -888,6 +1014,257 @@ def generate_bias_heatmaps(comp_df):
 
     print("  ✓ Fully aggregated")
 
+    # ========================================================================
+    # CATEGORY-AGGREGATED VERSIONS
+    # ========================================================================
+    print("\n" + "-"*80)
+    print("GENERATING CATEGORY-AGGREGATED HEATMAPS")
+    print("-"*80)
+
+    # Add category column to normalized dataframe
+    comp_df_norm['category'] = comp_df_norm['feature'].map(feature_to_category)
+
+    # 1. Category-aggregated disaggregated: One heatmap per prompt style
+    for prompt in PROMPT_STYLES:
+        prompt_data = comp_df_norm[comp_df_norm['prompt_style'] == prompt]
+
+        # Aggregate by category
+        agg_cat = prompt_data.groupby(['category', 'dataset', 'provider']).agg({
+            'bias_normalized': 'mean',
+            'significant': 'mean'
+        }).reset_index()
+
+        # Create pivot table: categories × (dataset-model combinations)
+        pivot = agg_cat.pivot_table(
+            values='bias_normalized',
+            index='category',
+            columns=['dataset', 'provider'],
+            aggfunc='mean'
+        )
+
+        pivot_sig = agg_cat.pivot_table(
+            values='significant',
+            index='category',
+            columns=['dataset', 'provider'],
+            aggfunc='mean'
+        )
+
+        if pivot.empty:
+            continue
+
+        # Create annotations with significance markers
+        annot_array = np.empty_like(pivot, dtype=object)
+        for i in range(pivot.shape[0]):
+            for j in range(pivot.shape[1]):
+                val = pivot.iloc[i, j]
+                sig = pivot_sig.iloc[i, j] if not pd.isna(pivot_sig.iloc[i, j]) else 0
+                if pd.isna(val):
+                    annot_array[i, j] = ''
+                elif sig > 0.75:
+                    annot_array[i, j] = f'{val:.3f}***'
+                elif sig > 0.60:
+                    annot_array[i, j] = f'{val:.3f}**'
+                elif sig > 0.50:
+                    annot_array[i, j] = f'{val:.3f}*'
+                else:
+                    annot_array[i, j] = f'{val:.3f}'
+
+        fig, ax = plt.subplots(figsize=(14, 6))
+        sns.heatmap(pivot, annot=annot_array, fmt='', cmap='Reds',
+                    vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+        ax.set_title(f'Bias by Feature Category - Prompt: {prompt}\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
+        ax.set_xlabel('Dataset × Model')
+        ax.set_ylabel('Feature Category')
+        plt.tight_layout()
+        plt.savefig(HEATMAP_DIR / f'disaggregated_prompt_{prompt}_by_category.png', bbox_inches='tight')
+        plt.close()
+
+    print("  ✓ Category-aggregated disaggregated heatmaps (by prompt style)")
+
+    # 2. Category-aggregated by dataset
+    agg_cat_dataset = comp_df_norm.groupby(['category', 'dataset']).agg({
+        'bias_normalized': 'mean',
+        'significant': 'mean'
+    }).reset_index()
+
+    pivot_cat_dataset = agg_cat_dataset.pivot_table(
+        values='bias_normalized',
+        index='category',
+        columns='dataset',
+        aggfunc='mean'
+    )
+
+    pivot_cat_dataset_sig = agg_cat_dataset.pivot_table(
+        values='significant',
+        index='category',
+        columns='dataset',
+        aggfunc='mean'
+    )
+
+    annot_cat_dataset = np.empty_like(pivot_cat_dataset, dtype=object)
+    for i in range(pivot_cat_dataset.shape[0]):
+        for j in range(pivot_cat_dataset.shape[1]):
+            val = pivot_cat_dataset.iloc[i, j]
+            sig = pivot_cat_dataset_sig.iloc[i, j] if not pd.isna(pivot_cat_dataset_sig.iloc[i, j]) else 0
+            if pd.isna(val):
+                annot_cat_dataset[i, j] = ''
+            elif sig > 0.75:
+                annot_cat_dataset[i, j] = f'{val:.3f}***'
+            elif sig > 0.60:
+                annot_cat_dataset[i, j] = f'{val:.3f}**'
+            elif sig > 0.50:
+                annot_cat_dataset[i, j] = f'{val:.3f}*'
+            else:
+                annot_cat_dataset[i, j] = f'{val:.3f}'
+
+    fig, ax = plt.subplots(figsize=(6, 5))
+    sns.heatmap(pivot_cat_dataset, annot=annot_cat_dataset, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+    ax.set_title('Bias by Feature Category × Dataset\n(Aggregated across Models & Prompts)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
+    ax.set_xlabel('Dataset')
+    ax.set_ylabel('Feature Category')
+    plt.tight_layout()
+    plt.savefig(HEATMAP_DIR / 'aggregated_by_dataset_by_category.png', bbox_inches='tight')
+    plt.close()
+
+    print("  ✓ Category-aggregated by dataset")
+
+    # 3. Category-aggregated by model
+    agg_cat_model = comp_df_norm.groupby(['category', 'provider']).agg({
+        'bias_normalized': 'mean',
+        'significant': 'mean'
+    }).reset_index()
+
+    pivot_cat_model = agg_cat_model.pivot_table(
+        values='bias_normalized',
+        index='category',
+        columns='provider',
+        aggfunc='mean'
+    )
+
+    pivot_cat_model_sig = agg_cat_model.pivot_table(
+        values='significant',
+        index='category',
+        columns='provider',
+        aggfunc='mean'
+    )
+
+    annot_cat_model = np.empty_like(pivot_cat_model, dtype=object)
+    for i in range(pivot_cat_model.shape[0]):
+        for j in range(pivot_cat_model.shape[1]):
+            val = pivot_cat_model.iloc[i, j]
+            sig = pivot_cat_model_sig.iloc[i, j] if not pd.isna(pivot_cat_model_sig.iloc[i, j]) else 0
+            if pd.isna(val):
+                annot_cat_model[i, j] = ''
+            elif sig > 0.75:
+                annot_cat_model[i, j] = f'{val:.3f}***'
+            elif sig > 0.60:
+                annot_cat_model[i, j] = f'{val:.3f}**'
+            elif sig > 0.50:
+                annot_cat_model[i, j] = f'{val:.3f}*'
+            else:
+                annot_cat_model[i, j] = f'{val:.3f}'
+
+    fig, ax = plt.subplots(figsize=(6, 5))
+    sns.heatmap(pivot_cat_model, annot=annot_cat_model, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+    ax.set_title('Bias by Feature Category × Model\n(Aggregated across Datasets & Prompts)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
+    ax.set_xlabel('Model Provider')
+    ax.set_ylabel('Feature Category')
+    plt.tight_layout()
+    plt.savefig(HEATMAP_DIR / 'aggregated_by_model_by_category.png', bbox_inches='tight')
+    plt.close()
+
+    print("  ✓ Category-aggregated by model")
+
+    # 4. Category-aggregated by prompt style
+    agg_cat_prompt = comp_df_norm.groupby(['category', 'prompt_style']).agg({
+        'bias_normalized': 'mean',
+        'significant': 'mean'
+    }).reset_index()
+
+    pivot_cat_prompt = agg_cat_prompt.pivot_table(
+        values='bias_normalized',
+        index='category',
+        columns='prompt_style',
+        aggfunc='mean'
+    )
+
+    pivot_cat_prompt_sig = agg_cat_prompt.pivot_table(
+        values='significant',
+        index='category',
+        columns='prompt_style',
+        aggfunc='mean'
+    )
+
+    annot_cat_prompt = np.empty_like(pivot_cat_prompt, dtype=object)
+    for i in range(pivot_cat_prompt.shape[0]):
+        for j in range(pivot_cat_prompt.shape[1]):
+            val = pivot_cat_prompt.iloc[i, j]
+            sig = pivot_cat_prompt_sig.iloc[i, j] if not pd.isna(pivot_cat_prompt_sig.iloc[i, j]) else 0
+            if pd.isna(val):
+                annot_cat_prompt[i, j] = ''
+            elif sig > 0.75:
+                annot_cat_prompt[i, j] = f'{val:.3f}***'
+            elif sig > 0.60:
+                annot_cat_prompt[i, j] = f'{val:.3f}**'
+            elif sig > 0.50:
+                annot_cat_prompt[i, j] = f'{val:.3f}*'
+            else:
+                annot_cat_prompt[i, j] = f'{val:.3f}'
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.heatmap(pivot_cat_prompt, annot=annot_cat_prompt, fmt='', cmap='Reds',
+                vmin=0, vmax=1, ax=ax, cbar_kws={'label': 'Normalized Bias'})
+    ax.set_title('Bias by Feature Category × Prompt Style\n(Aggregated across Datasets & Models)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
+    ax.set_xlabel('Prompt Style')
+    ax.set_ylabel('Feature Category')
+    plt.tight_layout()
+    plt.savefig(HEATMAP_DIR / 'aggregated_by_prompt_by_category.png', bbox_inches='tight')
+    plt.close()
+
+    print("  ✓ Category-aggregated by prompt style")
+
+    # 5. Fully category-aggregated
+    agg_cat_full = comp_df_norm.groupby('category').agg({
+        'bias_normalized': 'mean',
+        'significant': 'mean',
+        'bias': 'mean'
+    }).reset_index()
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    agg_cat_full_sorted = agg_cat_full.sort_values('bias_normalized', ascending=False)
+    bars = ax.barh(agg_cat_full_sorted['category'], agg_cat_full_sorted['bias_normalized'], color='steelblue')
+
+    # Color bars by significance level and add markers
+    for i, (idx, row) in enumerate(agg_cat_full_sorted.iterrows()):
+        sig = row['significant']
+        if sig > 0.75:
+            bars[i].set_color('darkred')
+            marker = '***'
+        elif sig > 0.60:
+            bars[i].set_color('coral')
+            marker = '**'
+        elif sig > 0.50:
+            bars[i].set_color('lightsalmon')
+            marker = '*'
+        else:
+            marker = ''
+
+        # Add significance marker at end of bar
+        if marker:
+            ax.text(row['bias_normalized'] + 0.01, i, marker,
+                   va='center', fontsize=12, fontweight='bold')
+
+    ax.set_xlabel('Normalized Bias (0-1)')
+    ax.set_title('Overall Bias by Feature Category (Fully Aggregated)\n(* p<0.05 >50%, ** p<0.05 >60%, *** p<0.05 >75%)', fontweight='bold')
+    ax.grid(axis='x', alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(HEATMAP_DIR / 'fully_aggregated_by_category.png', bbox_inches='tight')
+    plt.close()
+
+    print("  ✓ Fully category-aggregated")
+
     print(f"\n✓ Saved bias heatmaps to {HEATMAP_DIR}")
 
     # Print diagnostic info about zero bias
@@ -912,6 +1289,15 @@ def compute_directional_bias():
     print("\n" + "="*80)
     print("COMPUTING DIRECTIONAL BIAS")
     print("="*80)
+
+    # Check if directional bias data already exists
+    dir_bias_file = OUTPUT_DIR / 'directional_bias_data.parquet'
+    if dir_bias_file.exists():
+        print("\n✓ Loading cached directional bias data...")
+        df = pd.read_parquet(dir_bias_file)
+        print(f"  Loaded {len(df)} directional bias measurements from cache")
+        print(f"  To recompute, delete: {dir_bias_file}\n")
+        return df
 
     all_directional_data = []
     all_features = sum(FEATURES.values(), [])
@@ -989,6 +1375,11 @@ def compute_directional_bias():
 
     df_directional = pd.DataFrame(all_directional_data)
     print(f"✓ Computed directional bias for {len(df_directional)} feature-category-condition combinations")
+
+    # Save directional bias data for future use
+    dir_bias_file = OUTPUT_DIR / 'directional_bias_data.parquet'
+    df_directional.to_parquet(dir_bias_file, index=False)
+    print(f"✓ Saved directional bias data to {dir_bias_file}")
 
     return df_directional
 

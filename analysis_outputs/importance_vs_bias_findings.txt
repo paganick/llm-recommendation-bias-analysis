@@ -1,0 +1,112 @@
+================================================================================
+FEATURE IMPORTANCE VS. BIAS: KEY FINDINGS FOR PAPER
+================================================================================
+
+SUMMARY:
+Our analysis reveals a moderate positive correlation (r = 0.372) between
+feature importance (SHAP values) and bias magnitude, indicating that the
+relationship between what models use and what biases emerge is complex and
+not strictly linear. This finding highlights the distinction between direct
+and indirect sources of bias in LLM-based recommendation systems.
+
+
+KEY FINDING 1: Direct vs. Indirect Bias
+---------------------------------------
+We identify two distinct patterns in how bias manifests:
+
+1. HIGH IMPORTANCE, MODERATE BIAS (Direct Effect):
+   Text length emerges as the most important feature (SHAP = 0.168) with
+   moderate bias (0.429). This suggests the model explicitly uses text
+   length in its decision-making process, resulting in predictable
+   bias patterns.
+
+2. LOW IMPORTANCE, HIGH BIAS (Indirect Effect):
+   Sentiment features (polarity and subjectivity) show the highest bias
+   (0.620 and 0.587 respectively) despite relatively low feature importance
+   (SHAP = 0.034 and 0.043). This pattern indicates indirect or proxy
+   discrimination, where bias emerges as a byproduct of the model's reliance
+   on correlated features rather than direct usage.
+
+
+CATEGORY-LEVEL ANALYSIS:
+------------------------
+At the category level, this divergence is even more pronounced:
+
+- Text Metrics: Highest importance (SHAP = 0.115), moderate bias (0.406)
+  → Direct and intentional use by the model
+
+- Sentiment: Low importance (SHAP = 0.038), highest bias (0.604)
+  → Indirect bias through feature correlations
+
+- Toxicity: Moderate importance (SHAP = 0.055), moderate bias (0.359)
+  → Balanced direct effect
+
+- Author Demographics: Low importance (SHAP = 0.018), moderate bias (0.361)
+  → Potential fairness concern: demographic bias emerges despite low usage
+
+
+IMPLICATIONS FOR FAIRNESS:
+--------------------------
+1. DECEPTIVE SIMPLICITY: Feature importance alone is insufficient for
+   understanding bias. High-importance features may have low bias, while
+   low-importance features can exhibit severe bias through indirect pathways.
+
+2. HIDDEN DISCRIMINATION: The high bias in sentiment despite low direct
+   importance suggests that sentiment acts as a proxy for other features
+   the model explicitly optimizes. This form of bias is harder to detect
+   and mitigate because it arises from feature interactions rather than
+   direct discrimination.
+
+3. AUDIT REQUIREMENTS: Comprehensive bias audits must examine both:
+   - Feature importance (what the model uses)
+   - Distributional bias (what patterns emerge)
+   Analyzing only one dimension risks missing critical fairness issues.
+
+4. MITIGATION CHALLENGES: Addressing indirect bias requires understanding
+   feature correlations in the input space. Simply reducing the weight of
+   high-bias features may be ineffective if those features have low
+   importance to begin with.
+
+
+STATISTICAL SUMMARY:
+-------------------
+Correlation coefficient: r = 0.372 (p < 0.05)
+- Moderate positive relationship
+- Substantial unexplained variance (r² = 0.138)
+- Indicates complex, non-linear relationship
+
+Top discrepancies (High Bias, Low Importance):
+- Sentiment Polarity: SHAP = 0.034, Bias = 0.620 (ratio: 18.2×)
+- Sentiment Subjectivity: SHAP = 0.043, Bias = 0.587 (ratio: 13.7×)
+- Author Gender: SHAP = 0.016, Bias = 0.433 (ratio: 27.1×)
+
+These ratios highlight features where bias disproportionately exceeds their
+direct contribution to model decisions, suggesting indirect pathways of bias
+propagation.
+
+
+RECOMMENDATIONS FOR FUTURE WORK:
+--------------------------------
+1. Investigate feature correlations to identify proxy relationships
+2. Develop metrics that jointly consider importance and bias
+3. Design mitigation strategies that address both direct and indirect bias
+4. Evaluate whether indirect bias is stable across different datasets and
+   model configurations
+
+
+VISUALIZATION:
+-------------
+See: analysis_outputs/visualizations/4_feature_importance/importance_vs_bias_comparison.png
+
+The scatter plot clearly shows the four quadrants:
+- High Importance, High Bias: Features directly causing bias
+- High Importance, Low Bias: Fair usage of important features
+- Low Importance, High Bias: Indirect/proxy discrimination (key concern)
+- Low Importance, Low Bias: Minimal impact features
+
+================================================================================
+Generated: 2026-01-06
+Data: Aggregated across all datasets (Twitter/X, Bluesky, Reddit),
+      all models (OpenAI, Anthropic, Google Gemini),
+      and all prompt styles (6 variations)
+================================================================================
