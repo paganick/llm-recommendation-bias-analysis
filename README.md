@@ -1,108 +1,243 @@
-# LLM Recommendation Bias Analysis Pipeline
+# LLM Recommendation Bias Analysis
 
-Comprehensive analysis pipeline for evaluating bias in LLM recommendation systems across 16 features, 3 datasets, 3 providers, and 6 prompt styles.
+A comprehensive pipeline for analyzing bias in Large Language Model (LLM) recommendation systems. This framework evaluates how LLMs select content for recommendation across multiple dimensions including author demographics, content characteristics, sentiment, and toxicity.
 
 ## Overview
 
-This pipeline analyzes bias in LLM-based content recommendation systems by comparing feature distributions between the full post pool and recommended posts. It generates multiple types of visualizations and statistical analyses to identify and quantify bias patterns.
+This project investigates systematic biases in LLM-based content recommendation by:
+1. **Generating recommendations**: Using multiple LLMs to select posts from social media datasets
+2. **Analyzing bias**: Comparing feature distributions between the full post pool and recommended posts
+3. **Quantifying effects**: Using statistical measures and machine learning to identify bias patterns
 
-## Features Analyzed (16 Total)
+## Research Design
 
-**Author Features (3)**
-- `author_gender`, `author_political_leaning`, `author_is_minority`
+### Datasets
+- **Twitter/X**: Posts from Twitter with inferred user demographics
+- **Bluesky**: Posts from Bluesky social network
+- **Reddit**: Posts from various subreddits
 
-**Text Metrics (2)**
-- `text_length`, `avg_word_length`
+### LLM Providers
+- **OpenAI**: GPT-4o-mini
+- **Anthropic**: Claude Sonnet 4.5
+- **Google**: Gemini 2.0 Flash
 
-**Sentiment (2)**
-- `sentiment_polarity`, `sentiment_subjectivity`
+### Prompt Styles
+Six different recommendation prompts to evaluate sensitivity to framing:
+- `general` - General recommendation
+- `popular` - Likely to be popular
+- `engaging` - Engaging content
+- `informative` - Informative content
+- `controversial` - Controversial content
+- `neutral` - Neutral/balanced content
 
-**Style Features (4)**
-- `has_emoji`, `has_hashtag`, `has_mention`, `has_url`
+### Features Analyzed (16 Total)
 
-**Content Features (3)**
-- `polarization_score`, `controversy_level`, `primary_topic`
+| Category | Features |
+|----------|----------|
+| **Author Demographics** | `author_gender`, `author_political_leaning`, `author_is_minority` |
+| **Text Metrics** | `text_length`, `avg_word_length` |
+| **Sentiment** | `sentiment_polarity`, `sentiment_subjectivity` |
+| **Style** | `has_emoji`, `has_hashtag`, `has_mention`, `has_url` |
+| **Content** | `polarization_score`, `controversy_level`, `primary_topic` |
+| **Toxicity** | `toxicity`, `severe_toxicity` |
 
-**Toxicity Features (2)**
-- `toxicity`, `severe_toxicity`
-
-## Experimental Design
-
-- **Datasets**: Twitter, Bluesky, Reddit
-- **LLM Providers**: OpenAI, Anthropic, Gemini
-- **Prompt Styles**: general, popular, engaging, informative, controversial, neutral
-- **Sample Size**: 10,000 posts per prompt style (1,000 selected, 9,000 non-selected)
-- **Total Conditions**: 54 (3 datasets × 3 providers × 6 prompts)
-
-## Output Structure
+## Repository Structure
 
 ```
-analysis_outputs/
-├── feature_importance_data.csv          # Cached feature importance results
-├── pool_vs_recommended_summary.csv      # Bias metrics for all conditions
-└── visualizations/
-    ├── 1_distributions/                 # Feature distributions (16 plots)
-    ├── 2_bias_heatmaps/                 # Bias magnitude heatmaps (10 plots)
-    ├── 3_directional_bias/              # Directional bias plots (16 plots)
-    └── 4_feature_importance/            # Feature importance heatmaps (10 plots)
+.
+├── run_experiment.py              # Main experiment runner (generates recommendations)
+├── run_all_experiments.py         # Batch runner for all conditions
+├── run_comprehensive_analysis.py  # Main analysis pipeline
+├── regenerate_directional_bias.py # Regenerate directional bias data
+├── regenerate_visualizations.py   # Regenerate all visualizations
+├── generate_paper_plots.py        # Publication-quality figures
+├── generate_rq3_plots.py          # RQ3-specific visualizations
+├── generate_paper_*.py            # Additional paper plot scripts
+│
+├── data/                          # Data loading utilities
+│   └── loaders.py
+├── inference/                     # Metadata inference
+│   ├── metadata_inference.py      # Tweet/post metadata extraction
+│   └── persona_extraction.py      # Author persona extraction
+├── utils/                         # Utilities
+│   └── llm_client.py              # Unified LLM API client
+│
+├── datasets/                      # Source datasets (not tracked)
+├── outputs/                       # Experiment outputs
+│   └── experiments/               # Per-condition results
+├── analysis_outputs/              # Analysis results
+│   ├── visualizations/            # Generated plots
+│   │   ├── 1_distributions/       # Feature distributions
+│   │   ├── 2_bias_heatmaps_raw/   # Bias magnitude heatmaps
+│   │   ├── 3_directional_bias/    # Directional bias plots
+│   │   ├── 4_feature_importance/  # Feature importance
+│   │   └── paper_plots/           # Publication figures
+│   └── *.csv                      # Analysis data files
+│
+├── environment.yml                # Conda environment specification
+├── requirements.txt               # Pip requirements
+└── config.yaml.example            # Example configuration
 ```
 
-## Analysis Types
+## Installation
 
-### 1. Feature Distributions (16 plots)
-Shows the distribution of each feature in the pool data.
+### Using Conda (Recommended)
 
-### 2. Bias Heatmaps (10 plots)
-Normalized bias magnitude across features and conditions.
-- **Metric**: Cramér's V (categorical), Cohen's d (continuous)
-- **Normalization**: Within-feature min-max scaling [0, 1]
-- **Significance**: `*` p<0.05 >50%, `**` >60%, `***` >75%
+```bash
+# Create and activate environment
+conda env create -f environment.yml
+conda activate llm-bias
 
-### 3. Directional Bias (16 plots)
-Shows which categories/values are favored in recommendations.
-- Categorical: proportion_recommended - proportion_pool
-- Continuous: mean_recommended - mean_pool
+# Or update existing environment
+conda env update -f environment.yml
+```
 
-### 4. Feature Importance (10 heatmaps)
-Random Forest + SHAP analysis predicting recommendations.
-- Mean AUROC: 0.870 (range: 0.81-0.95)
-- Best: Twitter × Anthropic × Controversial (0.95)
+### Using Pip
+
+```bash
+pip install -r requirements.txt
+```
+
+### API Keys
+
+Set environment variables for the LLM APIs you plan to use:
+
+```bash
+export OPENAI_API_KEY="your-openai-key"
+export ANTHROPIC_API_KEY="your-anthropic-key"
+export GEMINI_API_KEY="your-gemini-key"
+```
+
+Or create a `.env` file (see `config.yaml.example`).
 
 ## Usage
 
+### 1. Generate Recommendations
+
+Run experiments to generate LLM recommendations:
+
 ```bash
-# Run full analysis
-python3 run_comprehensive_analysis.py
+# Single experiment
+python run_experiment.py --dataset twitter --provider anthropic --model claude-sonnet-4-5-20250929 --prompt general
 
-# Runtime: First run ~30-40 min, subsequent ~2-3 min (uses cached data)
-
-# Force recomputation:
-rm analysis_outputs/feature_importance_data.csv
+# All experiments (3 datasets x 3 providers x 6 prompts = 54 conditions)
+python run_all_experiments.py
 ```
 
-## Recent Updates (Dec 23, 2024)
+**Options:**
+- `--dataset`: twitter, reddit, bluesky
+- `--provider`: openai, anthropic, gemini, huggingface
+- `--model`: Model name (provider-specific)
+- `--prompt`: general, popular, engaging, informative, controversial, neutral
+- `--sample-size`: Number of posts to sample (default: 5000)
 
-- Fixed feature importance: Now includes all 16 features (was only 5)
-- Fixed SHAP storage: Scalars instead of string arrays
-- Added caching for feature importance results
-- Updated all colormaps to 'Reds' (white-to-red)
-- Reorganized output folders (1-4)
-- Mean AUROC improved to 0.870
+### 2. Run Analysis
+
+After generating recommendations, run the comprehensive analysis:
+
+```bash
+python run_comprehensive_analysis.py
+```
+
+This generates:
+- Feature distribution plots
+- Bias magnitude heatmaps
+- Directional bias analysis
+- Feature importance (Random Forest + SHAP)
+
+**Runtime:** ~30-40 minutes first run (builds feature importance cache), ~2-3 minutes on subsequent runs.
+
+### 3. Generate Paper Plots
+
+Create publication-quality figures:
+
+```bash
+# Main paper plots
+python generate_paper_plots.py
+
+# RQ3-specific plots
+python generate_rq3_plots.py
+
+# Feature importance by model
+python generate_paper_feature_importance_by_model.py
+```
+
+## Analysis Methodology
+
+### Bias Metrics
+
+**Categorical Features:**
+- **Cramér's V**: Effect size for categorical associations (0-1 scale)
+- **Chi-square test**: Statistical significance
+
+**Continuous Features:**
+- **Cohen's d**: Standardized mean difference
+- **t-test / Mann-Whitney U**: Statistical significance
+
+### Directional Bias
+
+Measures which categories/values are favored:
+- **Categorical**: `proportion_recommended - proportion_pool`
+- **Continuous**: `mean_recommended - mean_pool`
+
+### Feature Importance
+
+Random Forest classifiers predict recommendation status:
+- **AUROC**: Model discrimination ability
+- **SHAP values**: Feature contribution to predictions
+- Mean AUROC across conditions: 0.870
+
+### Significance Markers
+
+- `*` p < 0.05 in >50% of conditions
+- `**` p < 0.05 in >60% of conditions
+- `***` p < 0.05 in >75% of conditions
+
+## Output Files
+
+### Analysis Data
+| File | Description |
+|------|-------------|
+| `pool_vs_recommended_summary.csv` | Bias metrics for all conditions |
+| `directional_bias_data.csv` | Directional bias by feature/condition |
+| `feature_importance_data.csv` | Cached feature importance results |
+
+### Visualizations
+| Directory | Contents |
+|-----------|----------|
+| `1_distributions/` | Feature distribution histograms (16 plots) |
+| `2_bias_heatmaps_raw/` | Bias magnitude heatmaps by aggregation |
+| `3_directional_bias/` | Directional bias bar plots (16 plots) |
+| `4_feature_importance/` | SHAP-based importance heatmaps |
+| `paper_plots/` | Publication-ready figures with data CSVs |
+
+## Experimental Conditions
+
+Total: **54 conditions** (3 datasets × 3 providers × 6 prompts)
+
+Each condition:
+- Pool size: 10,000 posts
+- Recommended: 1,000 posts
+- Non-recommended: 9,000 posts
 
 ## Dependencies
 
-`pandas numpy matplotlib seaborn scipy scikit-learn shap`
+### Core
+- Python 3.10+
+- pandas, numpy, scipy
+- scikit-learn, shap
+- matplotlib, seaborn
 
-## Key Findings
+### LLM APIs
+- anthropic (Claude)
+- openai (GPT)
+- google-generativeai (Gemini)
 
-### Bias Normalization
-- Within-feature min-max scaling: values comparable within a feature, not across
-- Consistent moderate bias → high normalized values
-- Wide range with outliers → lower mean normalized values
+### Optional (for local models)
+- transformers, torch, accelerate
 
-### Directional vs Magnitude Bias  
-- **Magnitude**: How strong is the association? (Cramér's V, Cohen's d)
-- **Directional**: Which categories are favored?
-- High magnitude doesn't always mean different directional patterns
+See `environment.yml` or `requirements.txt` for full specifications.
 
-See documentation in script header for detailed methodology.
+## License
+
+[Add license information]
