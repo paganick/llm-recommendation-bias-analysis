@@ -207,7 +207,7 @@ def load_dataset(dataset_name: str, **kwargs) -> pd.DataFrame:
     Convenience function to load datasets.
 
     Args:
-        dataset_name: 'twitter', 'reddit', 'bluesky', 'twitteraae', or 'dadit'
+        dataset_name: 'twitter', 'reddit', 'bluesky', 'survey_twitter', 'twitteraae', or 'dadit'
         **kwargs: Arguments passed to specific loader
 
     Returns:
@@ -215,12 +215,13 @@ def load_dataset(dataset_name: str, **kwargs) -> pd.DataFrame:
     """
     dataset_name = dataset_name.lower()
 
-    # Persona-based datasets
-    if dataset_name in ['twitter', 'reddit', 'bluesky']:
+    # Persona-based datasets (including survey_twitter)
+    if dataset_name in ['twitter', 'reddit', 'bluesky', 'survey_twitter']:
         # Try default path first, then alternative paths
         default_path = f'./datasets/{dataset_name}/personas.pkl'
         alt_paths = {
-            'bluesky': '../demdia_val/data/bluesky/personas.pkl'
+            'bluesky': '../demdia_val/data/bluesky/personas.pkl',
+            'survey_twitter': './datasets/survey_twitter/personas.pkl'
         }
 
         # Check if default path exists, otherwise try alternative
@@ -254,4 +255,4 @@ def load_dataset(dataset_name: str, **kwargs) -> pd.DataFrame:
 
     else:
         raise ValueError(f"Unknown dataset: {dataset_name}. "
-                       f"Available: twitter, reddit, bluesky, twitteraae, dadit")
+                       f"Available: twitter, reddit, bluesky, survey_twitter, twitteraae, dadit")
