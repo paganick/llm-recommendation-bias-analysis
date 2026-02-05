@@ -24,6 +24,7 @@ ENV/
 datasets/
 outputs/
 old_outputs_backup_*/
+test_data/
 *.pkl
 *.log
 
