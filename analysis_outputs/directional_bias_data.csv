@@ -10,6 +10,7 @@ author_political_leaning,unknown,bluesky,anthropic,general,-0.013981965891008582
 author_is_minority,no,bluesky,anthropic,general,0.05311914862659739,0.8546040208819282,0.9077231695085256,categorical,,,
 author_is_minority,unknown,bluesky,anthropic,general,-0.00959994278069129,0.02865711429523492,0.01905717151454363,categorical,,,
 author_is_minority,yes,bluesky,anthropic,general,-0.027770081320268702,0.0939686771076308,0.06619859578736209,categorical,,,
+author_is_minority,unknown,bluesky,anthropic,general,-0.015749124525637336,0.02277018771520604,0.007021063189568706,categorical,,,
 text_length,mean_difference,bluesky,anthropic,general,12.439188051770572,,,continuous,197.22781295123846,209.66700100300903,0.14639302392815973
 avg_word_length,mean_difference,bluesky,anthropic,general,0.10422782088501492,,,continuous,4.428468599758451,4.532696420643466,0.15998914964498628
 sentiment_polarity,mean_difference,bluesky,anthropic,general,-0.06223715340178037,,,continuous,0.10661408419415751,0.04437693079237714,-0.11747489361394
@@ -44,6 +45,7 @@ author_political_leaning,unknown,bluesky,anthropic,popular,-0.008323048371729464
 author_is_minority,no,bluesky,anthropic,popular,0.08478447698852287,0.851514815225835,0.9362992922143579,categorical,,,
 author_is_minority,unknown,bluesky,anthropic,popular,-0.022885521672814456,0.02996337809344135,0.007077856420626896,categorical,,,
 author_is_minority,yes,bluesky,anthropic,popular,-0.05969201332289184,0.097103540117634,0.03741152679474216,categorical,,,
+author_is_minority,unknown,bluesky,anthropic,popular,-0.0022069419928165517,0.021418266563089556,0.019211324570273004,categorical,,,
 text_length,mean_difference,bluesky,anthropic,popular,-23.447189980923213,,,continuous,200.7869270891133,177.3397371081901,-0.27995630370000985
 avg_word_length,mean_difference,bluesky,anthropic,popular,-0.04804893282833067,,,continuous,4.443612152957408,4.395563220129078,-0.07380145331275881
 sentiment_polarity,mean_difference,bluesky,anthropic,popular,-0.09071896124262908,,,continuous,0.10938114526689602,0.018662184024266937,-0.1717394806729262
@@ -78,6 +80,7 @@ author_political_leaning,unknown,bluesky,anthropic,engaging,-0.01504038567907213
 author_is_minority,no,bluesky,anthropic,engaging,0.11717022562603774,0.8483470157532726,0.9655172413793104,categorical,,,
 author_is_minority,unknown,bluesky,anthropic,engaging,-0.019478602363418456,0.02962059019303306,0.010141987829614604,categorical,,,
 author_is_minority,yes,bluesky,anthropic,engaging,-0.07867320206431196,0.09895717772354116,0.02028397565922921,categorical,,,
+author_is_minority,unknown,bluesky,anthropic,engaging,-0.019018421198307253,0.023075216330153095,0.004056795131845842,categorical,,,
 text_length,mean_difference,bluesky,anthropic,engaging,-1.1245162472079642,,,continuous,198.5788773019747,197.45436105476674,-0.013318851690311927
 avg_word_length,mean_difference,bluesky,anthropic,engaging,-0.03836982563412761,,,continuous,4.442643378308212,4.404273552674084,-0.05865510369352642
 sentiment_polarity,mean_difference,bluesky,anthropic,engaging,-0.1315533212028528,,,continuous,0.11338019747060128,-0.018173123732251516,-0.25024947371299994
@@ -112,6 +115,7 @@ author_political_leaning,unknown,bluesky,anthropic,informative,-0.01843829834499
 author_is_minority,no,bluesky,anthropic,informative,-0.037121583566650185,0.863601021881595,0.8264794383149449,categorical,,,
 author_is_minority,unknown,bluesky,anthropic,informative,0.01936621817022767,0.0257691880484283,0.04513540621865597,categorical,,,
 author_is_minority,yes,bluesky,anthropic,informative,0.040188988603041154,0.08719315783627679,0.12738214643931794,categorical,,,
+author_is_minority,unknown,bluesky,anthropic,informative,-0.022433623206618635,0.023436632233699878,0.0010030090270812437,categorical,,,
 text_length,mean_difference,bluesky,anthropic,informative,45.40045104768933,,,continuous,193.94157503054538,239.3420260782347,0.532436071324466
 avg_word_length,mean_difference,bluesky,anthropic,informative,0.3943950903698621,,,continuous,4.3995389229908115,4.793934013360674,0.6232727391915892
 sentiment_polarity,mean_difference,bluesky,anthropic,informative,0.0304890982176787,,,continuous,0.09736927690769742,0.12785837512537612,0.05710255440367542
@@ -146,6 +150,7 @@ author_political_leaning,unknown,bluesky,anthropic,controversial,-0.018442395289
 author_is_minority,no,bluesky,anthropic,controversial,0.027757898994428265,0.8571269858904567,0.8848848848848849,categorical,,,
 author_is_minority,unknown,bluesky,anthropic,controversial,0.00036443509390959514,0.027663592934118433,0.028028028028028028,categorical,,,
 author_is_minority,yes,bluesky,anthropic,controversial,-0.004569395525955908,0.09165648261304299,0.08708708708708708,categorical,,,
+author_is_minority,unknown,bluesky,anthropic,controversial,-0.023552938562381956,0.023552938562381956,0.0,categorical,,,
 text_length,mean_difference,bluesky,anthropic,controversial,40.16511567672549,,,continuous,194.45550494389514,234.62062062062063,0.4728013978404778
 avg_word_length,mean_difference,bluesky,anthropic,controversial,0.19538170498944396,,,continuous,4.419341481172242,4.614723186161686,0.3011006136074505
 sentiment_polarity,mean_difference,bluesky,anthropic,controversial,-0.07738894428257832,,,continuous,0.10814019553382957,0.03075125125125125,-0.14691507005545182
@@ -180,6 +185,7 @@ author_political_leaning,unknown,bluesky,anthropic,neutral,-0.013921352597638152
 author_is_minority,no,bluesky,anthropic,neutral,0.10260840162093898,0.8497725507600133,0.9523809523809523,categorical,,,
 author_is_minority,unknown,bluesky,anthropic,neutral,-0.026236896811551388,0.03028958171530012,0.004052684903748734,categorical,,,
 author_is_minority,yes,bluesky,anthropic,neutral,-0.05959465731756819,0.09708199267724398,0.037487335359675786,categorical,,,
+author_is_minority,unknown,bluesky,anthropic,neutral,-0.016776847491819482,0.022855874847442583,0.0060790273556231,categorical,,,
 text_length,mean_difference,bluesky,anthropic,neutral,33.00319441769969,,,continuous,195.21058471097305,228.21377912867274,0.38826939808939054
 avg_word_length,mean_difference,bluesky,anthropic,neutral,0.09982232166215432,,,continuous,4.4290076503526326,4.528829972014787,0.1531067046700623
 sentiment_polarity,mean_difference,bluesky,anthropic,neutral,-0.020080217890829977,,,continuous,0.10239095750582491,0.08231073961499494,-0.03805566293358404
@@ -214,6 +220,7 @@ author_political_leaning,unknown,bluesky,gemini,general,-0.00838953233686478,0.0
 author_is_minority,no,bluesky,gemini,general,0.026115586260006318,0.8573014991671294,0.8834170854271357,categorical,,,
 author_is_minority,unknown,bluesky,gemini,general,-0.0006266758556804017,0.0277623542476402,0.027135678391959798,categorical,,,
 author_is_minority,yes,bluesky,gemini,general,-0.011991104885895332,0.09239311493614659,0.08040201005025126,categorical,,,
+author_is_minority,unknown,bluesky,gemini,general,-0.013497805518430578,0.022543031649083844,0.009045226130653266,categorical,,,
 text_length,mean_difference,bluesky,gemini,general,6.901068362355943,,,continuous,197.78134369794557,204.68241206030152,0.08143140256002804
 avg_word_length,mean_difference,bluesky,gemini,general,0.052946299012880615,,,continuous,4.433591956748906,4.486538255761786,0.08225207291679988
 sentiment_polarity,mean_difference,bluesky,gemini,general,-0.022088113861924843,,,continuous,0.10260680732926153,0.08051869346733669,-0.04167643201237379
@@ -248,6 +255,7 @@ author_political_leaning,unknown,bluesky,gemini,popular,0.0008476419621948963,0.
 author_is_minority,no,bluesky,gemini,popular,0.04433860431663317,0.8555592506374016,0.8998978549540347,categorical,,,
 author_is_minority,unknown,bluesky,gemini,popular,-0.008060071840090749,0.028489081033144886,0.020429009193054137,categorical,,,
 author_is_minority,yes,bluesky,gemini,popular,-0.02523314400096291,0.09367032479769427,0.06843718079673136,categorical,,,
+author_is_minority,unknown,bluesky,gemini,popular,-0.011045388475579454,0.02228134353175923,0.011235955056179775,categorical,,,
 text_length,mean_difference,bluesky,gemini,popular,-14.78693852353814,,,continuous,199.91564128145438,185.12870275791624,-0.17630639323559905
 avg_word_length,mean_difference,bluesky,gemini,popular,-0.0843892051449524,,,continuous,4.447121816684377,4.362732611539425,-0.13071714619439942
 sentiment_polarity,mean_difference,bluesky,gemini,popular,-0.006431877044585213,,,continuous,0.10103872076266489,0.09460684371807968,-0.012172752115725884
@@ -282,6 +290,7 @@ author_political_leaning,unknown,bluesky,gemini,engaging,-0.011197835333099062,0
 author_is_minority,no,bluesky,gemini,engaging,0.09881646131301025,0.8507001874517588,0.949516648764769,categorical,,,
 author_is_minority,unknown,bluesky,gemini,engaging,-0.01751543453880673,0.029330686955562908,0.011815252416756176,categorical,,,
 author_is_minority,yes,bluesky,gemini,engaging,-0.06503096738111996,0.09725438306318226,0.0322234156820623,categorical,,,
+author_is_minority,unknown,bluesky,gemini,engaging,-0.016270059393083625,0.022714742529496085,0.00644468313641246,categorical,,,
 text_length,mean_difference,bluesky,gemini,engaging,9.080984205232141,,,continuous,197.6225603704929,206.70354457572503,0.10742166531398219
 avg_word_length,mean_difference,bluesky,gemini,engaging,0.009293775575017982,,,continuous,4.437994862994652,4.44728863856967,0.014331148314127327
 sentiment_polarity,mean_difference,bluesky,gemini,engaging,-0.09059842584107829,,,continuous,0.1088437534458044,0.018245327604726105,-0.17194209134452096
@@ -316,6 +325,7 @@ author_political_leaning,unknown,bluesky,gemini,informative,-0.01843420322043309
 author_is_minority,no,bluesky,gemini,informative,-0.02522384270045397,0.8624097723486952,0.8371859296482412,categorical,,,
 author_is_minority,unknown,bluesky,gemini,informative,0.012766218655744017,0.026429761243753472,0.03919597989949749,categorical,,,
 author_is_minority,yes,bluesky,gemini,informative,0.03265187681885273,0.08795113825652415,0.12060301507537688,categorical,,,
+author_is_minority,unknown,bluesky,gemini,informative,-0.020194252774142784,0.023209328151027206,0.003015075376884422,categorical,,,
 text_length,mean_difference,bluesky,gemini,informative,42.18241680361831,,,continuous,194.27084952803997,236.45326633165828,0.4948712431953272
 avg_word_length,mean_difference,bluesky,gemini,informative,0.34554061954757564,,,continuous,4.404478821855703,4.750019441403278,0.5438700346244869
 sentiment_polarity,mean_difference,bluesky,gemini,informative,0.042439633146297825,,,continuous,0.09618629650194337,0.1386259296482412,0.07945285739668707
@@ -350,6 +360,7 @@ author_political_leaning,unknown,bluesky,gemini,controversial,-0.016141001855287
 author_is_minority,no,bluesky,gemini,controversial,0.07839494999773744,0.8522172949002217,0.9306122448979591,categorical,,,
 author_is_minority,unknown,bluesky,gemini,controversial,-0.01260916783564867,0.02893569844789357,0.0163265306122449,categorical,,,
 author_is_minority,yes,bluesky,gemini,controversial,-0.04567627494456762,0.09567627494456762,0.05,categorical,,,
+author_is_minority,unknown,bluesky,gemini,controversial,-0.020109507217521156,0.023170731707317073,0.003061224489795918,categorical,,,
 text_length,mean_difference,bluesky,gemini,controversial,32.80505905244581,,,continuous,195.2531042128603,228.05816326530612,0.3868668351806009
 avg_word_length,mean_difference,bluesky,gemini,controversial,0.07813358006139204,,,continuous,4.43120302265467,4.509336602716062,0.11983676785146084
 sentiment_polarity,mean_difference,bluesky,gemini,controversial,-0.1091737852391511,,,continuous,0.1111080709534368,0.0019342857142857124,-0.20744117910448698
@@ -384,6 +395,7 @@ author_political_leaning,unknown,bluesky,gemini,neutral,-0.013741024834696263,0.
 author_is_minority,no,bluesky,gemini,neutral,0.09144959800217867,0.8511391285113913,0.94258872651357,categorical,,,
 author_is_minority,unknown,bluesky,gemini,neutral,-0.02255376094578813,0.029860650298606503,0.007306889352818371,categorical,,,
 author_is_minority,yes,bluesky,gemini,neutral,-0.05122187850804341,0.09610705596107055,0.04488517745302714,categorical,,,
+author_is_minority,unknown,bluesky,gemini,neutral,-0.0176739585483471,0.02289316522893165,0.005219206680584551,categorical,,,
 text_length,mean_difference,bluesky,gemini,neutral,13.94981157290104,,,continuous,197.13160805131608,211.08141962421712,0.1643516859084918
 avg_word_length,mean_difference,bluesky,gemini,neutral,0.014469796227917442,,,continuous,4.437473907022053,4.45194370324997,0.022260981886657163
 sentiment_polarity,mean_difference,bluesky,gemini,neutral,-0.03409623141184333,,,continuous,0.1036754589692546,0.06957922755741128,-0.06449339661610294
@@ -418,6 +430,7 @@ author_political_leaning,unknown,bluesky,openai,general,-0.015111111111111113,0.
 author_is_minority,no,bluesky,openai,general,0.06677777777777782,0.8532222222222222,0.92,categorical,,,
 author_is_minority,unknown,bluesky,openai,general,-0.010777777777777778,0.028777777777777777,0.018,categorical,,,
 author_is_minority,yes,bluesky,openai,general,-0.0391111111111111,0.0951111111111111,0.056,categorical,,,
+author_is_minority,unknown,bluesky,openai,general,-0.01688888888888889,0.02288888888888889,0.006,categorical,,,
 text_length,mean_difference,bluesky,openai,general,16.414444444444456,,,continuous,196.82655555555556,213.241,0.19381063246370298
 avg_word_length,mean_difference,bluesky,openai,general,0.045104774499138856,,,continuous,4.434349636050773,4.479454410549912,0.069542663029325
 sentiment_polarity,mean_difference,bluesky,openai,general,0.012161733333333327,,,continuous,0.09919286666666667,0.1113546,0.02303739443363214
@@ -452,6 +465,7 @@ author_political_leaning,unknown,bluesky,openai,popular,-0.015111111111111113,0.
 author_is_minority,no,bluesky,openai,popular,0.0845555555555556,0.8514444444444444,0.936,categorical,,,
 author_is_minority,unknown,bluesky,openai,popular,-0.017444444444444443,0.029444444444444443,0.012,categorical,,,
 author_is_minority,yes,bluesky,openai,popular,-0.049111111111111105,0.0961111111111111,0.047,categorical,,,
+author_is_minority,unknown,bluesky,openai,popular,-0.018,0.023,0.005,categorical,,,
 text_length,mean_difference,bluesky,openai,popular,10.27666666666667,,,continuous,197.44033333333334,207.717,0.1217459706807404
 avg_word_length,mean_difference,bluesky,openai,popular,0.0009036533048609741,,,continuous,4.438769748170201,4.439673401475062,0.0013952436036713746
 sentiment_polarity,mean_difference,bluesky,openai,popular,0.009369288888888896,,,continuous,0.0994721111111111,0.10884139999999999,0.01774557245532093
@@ -486,6 +500,7 @@ author_political_leaning,unknown,bluesky,openai,engaging,-0.011769796682584151,0
 author_is_minority,no,bluesky,openai,engaging,0.08113868784905331,0.8517942450838796,0.9329329329329329,categorical,,,
 author_is_minority,unknown,bluesky,openai,engaging,-0.014092861887551366,0.02910787690256638,0.015015015015015015,categorical,,,
 author_is_minority,yes,bluesky,openai,engaging,-0.05238968554155756,0.0964337295856016,0.044044044044044044,categorical,,,
+author_is_minority,unknown,bluesky,openai,engaging,-0.014656140419944442,0.02266414842795245,0.008008008008008008,categorical,,,
 text_length,mean_difference,bluesky,openai,engaging,15.177345993921932,,,continuous,196.9517831352072,212.12912912912913,0.17957019772834934
 avg_word_length,mean_difference,bluesky,openai,engaging,-0.0017039162898129234,,,continuous,4.439030334738039,4.437326418448226,-0.0026229196987449226
 sentiment_polarity,mean_difference,bluesky,openai,engaging,-0.0014765692923230656,,,continuous,0.10055654927230306,0.09907997997998,-0.0027982641450591083
@@ -520,6 +535,7 @@ author_political_leaning,unknown,bluesky,openai,informative,-0.01622222222222222
 author_is_minority,no,bluesky,openai,informative,0.024555555555555553,0.8574444444444445,0.882,categorical,,,
 author_is_minority,unknown,bluesky,openai,informative,0.005888888888888891,0.02711111111111111,0.033,categorical,,,
 author_is_minority,yes,bluesky,openai,informative,-0.010222222222222216,0.09222222222222222,0.082,categorical,,,
+author_is_minority,unknown,bluesky,openai,informative,-0.02022222222222222,0.02322222222222222,0.003,categorical,,,
 text_length,mean_difference,bluesky,openai,informative,35.45333333333335,,,continuous,194.92266666666666,230.376,0.4179615571226116
 avg_word_length,mean_difference,bluesky,openai,informative,0.21474468487106968,,,continuous,4.41738564501358,4.6321303298846495,0.3337149985497639
 sentiment_polarity,mean_difference,bluesky,openai,informative,0.01199217777777778,,,continuous,0.09920982222222222,0.111202,0.022619997279473027
@@ -554,6 +570,7 @@ author_political_leaning,unknown,bluesky,openai,controversial,-0.017333333333333
 author_is_minority,no,bluesky,openai,controversial,0.07677777777777783,0.8522222222222222,0.929,categorical,,,
 author_is_minority,unknown,bluesky,openai,controversial,-0.008555555555555556,0.028555555555555556,0.02,categorical,,,
 author_is_minority,yes,bluesky,openai,controversial,-0.049111111111111105,0.0961111111111111,0.047,categorical,,,
+author_is_minority,unknown,bluesky,openai,controversial,-0.01911111111111111,0.02311111111111111,0.004,categorical,,,
 text_length,mean_difference,bluesky,openai,controversial,24.74000000000001,,,continuous,195.994,220.734,0.29161313224688523
 avg_word_length,mean_difference,bluesky,openai,controversial,0.06327590816751893,,,continuous,4.4325325226839345,4.495808430851453,0.09726366145365092
 sentiment_polarity,mean_difference,bluesky,openai,controversial,-0.08495059999999999,,,continuous,0.10890409999999999,0.023953500000000006,-0.16140215092486052
@@ -588,6 +605,7 @@ author_political_leaning,unknown,bluesky,openai,neutral,-0.013999999999999999,0.
 author_is_minority,no,bluesky,openai,neutral,0.09566666666666657,0.8503333333333334,0.946,categorical,,,
 author_is_minority,unknown,bluesky,openai,neutral,-0.018555555555555558,0.029555555555555557,0.011,categorical,,,
 author_is_minority,yes,bluesky,openai,neutral,-0.05911111111111111,0.0971111111111111,0.038,categorical,,,
+author_is_minority,unknown,bluesky,openai,neutral,-0.018,0.023,0.005,categorical,,,
 text_length,mean_difference,bluesky,openai,neutral,19.831111111111113,,,continuous,196.4848888888889,216.316,0.23376906439113793
 avg_word_length,mean_difference,bluesky,openai,neutral,0.014891961980771029,,,continuous,4.4373709173026095,4.4522628792833805,0.022836856009288944
 sentiment_polarity,mean_difference,bluesky,openai,neutral,-0.036329266666666665,,,continuous,0.10404196666666667,0.0677127,-0.06903884341364848
@@ -621,6 +639,7 @@ author_political_leaning,center-right,reddit,anthropic,general,-0.00075022918695
 author_political_leaning,left,reddit,anthropic,general,-0.017987595255829936,0.9675843694493783,0.9495967741935484,categorical,,,
 author_is_minority,no,reddit,anthropic,general,0.04252313355870052,0.7830817051509769,0.8256048387096774,categorical,,,
 author_is_minority,yes,reddit,anthropic,general,0.00035631410072767267,0.07726465364120781,0.07762096774193548,categorical,,,
+author_is_minority,unknown,reddit,anthropic,general,-0.042879447659428194,0.1396536412078153,0.0967741935483871,categorical,,,
 text_length,mean_difference,reddit,anthropic,general,148.93621619492347,,,continuous,142.5567273534636,291.4929435483871,0.7458619248521503
 avg_word_length,mean_difference,reddit,anthropic,general,0.15818092742075596,,,continuous,4.424432810660595,4.582613738081351,0.1908036714404953
 sentiment_polarity,mean_difference,reddit,anthropic,general,0.054446650826505474,,,continuous,-0.06558626776198935,-0.011139616935483872,0.1125462217552319
@@ -655,6 +674,7 @@ author_political_leaning,center-right,reddit,anthropic,popular,-0.00185693725521
 author_political_leaning,left,reddit,anthropic,popular,0.018835115010615633,0.9639409741484523,0.9827760891590679,categorical,,,
 author_is_minority,no,reddit,anthropic,popular,-0.022555621841287232,0.789526239875735,0.7669706180344478,categorical,,,
 author_is_minority,yes,reddit,anthropic,popular,0.023274835144687436,0.07500277377121935,0.09827760891590678,categorical,,,
+author_is_minority,unknown,reddit,anthropic,popular,-0.0007192133034002179,0.1354709863530456,0.1347517730496454,categorical,,,
 text_length,mean_difference,reddit,anthropic,popular,-17.716045190157047,,,continuous,159.0797736602685,141.36372847011145,-0.0783971861290866
 avg_word_length,mean_difference,reddit,anthropic,popular,-0.012914912182842464,,,continuous,4.44139906049318,4.428484148310337,-0.015726774108935596
 sentiment_polarity,mean_difference,reddit,anthropic,popular,-0.006912054736651373,,,continuous,-0.059502940197492506,-0.06641499493414388,-0.014008746393483446
@@ -689,6 +709,7 @@ author_political_leaning,center-right,reddit,anthropic,engaging,-0.0018643706768
 author_political_leaning,left,reddit,anthropic,engaging,0.022262581419074223,0.9635960044395117,0.9858585858585859,categorical,,,
 author_is_minority,no,reddit,anthropic,engaging,-0.016173948138432093,0.7889012208657048,0.7727272727272727,categorical,,,
 author_is_minority,yes,reddit,anthropic,engaging,0.02183096223051828,0.07513873473917869,0.09696969696969697,categorical,,,
+author_is_minority,unknown,reddit,anthropic,engaging,-0.0056570140920862155,0.13596004439511652,0.1303030303030303,categorical,,,
 text_length,mean_difference,reddit,anthropic,engaging,30.083422459893058,,,continuous,154.35294117647058,184.43636363636364,0.13414163802746645
 avg_word_length,mean_difference,reddit,anthropic,engaging,0.07418442848583329,,,continuous,4.432780100240636,4.50696452872647,0.08965784796437237
 sentiment_polarity,mean_difference,reddit,anthropic,engaging,-0.10055369634188727,,,continuous,-0.050230344062153154,-0.15078404040404042,-0.2065809049366686
@@ -723,6 +744,7 @@ author_political_leaning,center-right,reddit,anthropic,informative,0.00040488093
 author_political_leaning,left,reddit,anthropic,informative,-0.022934836713052187,0.9680567879325643,0.9451219512195121,categorical,,,
 author_is_minority,no,reddit,anthropic,informative,0.08599977636865985,0.7788376220053239,0.8648373983739838,categorical,,,
 author_is_minority,yes,reddit,anthropic,informative,-0.023741893363920324,0.07963620230700975,0.05589430894308943,categorical,,,
+author_is_minority,unknown,reddit,anthropic,informative,-0.06225788300473954,0.14152617568766637,0.07926829268292683,categorical,,,
 text_length,mean_difference,reddit,anthropic,informative,247.4125709668809,,,continuous,132.9858030168589,380.3983739837398,1.533067857097354
 avg_word_length,mean_difference,reddit,anthropic,informative,0.27186208035971404,,,continuous,4.413373129953338,4.685235210313052,0.32821140906205293
 sentiment_polarity,mean_difference,reddit,anthropic,informative,0.04900434169425989,,,continuous,-0.06500718722271517,-0.016002845528455278,0.10155170585724749
@@ -757,6 +779,7 @@ author_political_leaning,center-right,reddit,anthropic,controversial,0.001455254
 author_political_leaning,left,reddit,anthropic,controversial,-0.056621129394981984,0.9714507887136192,0.9148296593186372,categorical,,,
 author_is_minority,no,reddit,anthropic,controversial,0.0615256284619895,0.7811597422794935,0.842685370741483,categorical,,,
 author_is_minority,yes,reddit,anthropic,controversial,-0.004614205082014725,0.07776049766718507,0.07314629258517034,categorical,,,
+author_is_minority,unknown,reddit,anthropic,controversial,-0.05691142337997479,0.14107976005332148,0.0841683366733467,categorical,,,
 text_length,mean_difference,reddit,anthropic,controversial,150.03508728187322,,,continuous,142.35769828926905,292.39278557114227,0.7900763000077771
 avg_word_length,mean_difference,reddit,anthropic,controversial,0.15871175298021623,,,continuous,4.424284925713308,4.582996678693524,0.1900371802817974
 sentiment_polarity,mean_difference,reddit,anthropic,controversial,0.017407832416666262,,,continuous,-0.061922461675183296,-0.044514629258517034,0.03609929647140789
@@ -791,6 +814,7 @@ author_political_leaning,center-right,reddit,anthropic,neutral,0.000373323279478
 author_political_leaning,left,reddit,anthropic,neutral,-0.01692197252237615,0.9674769674769674,0.9505549949545913,categorical,,,
 author_is_minority,no,reddit,anthropic,neutral,0.053523895098062546,0.781995781995782,0.8355196770938446,categorical,,,
 author_is_minority,yes,reddit,anthropic,neutral,-0.009637520232878463,0.07825507825507826,0.06861755802219979,categorical,,,
+author_is_minority,unknown,reddit,anthropic,neutral,-0.04388637486518414,0.13974913974913974,0.0958627648839556,categorical,,,
 text_length,mean_difference,reddit,anthropic,neutral,169.51518130932865,,,continuous,140.53224553224553,310.0474268415742,0.8628859076159524
 avg_word_length,mean_difference,reddit,anthropic,neutral,0.19660995676411375,,,continuous,4.42064031194541,4.617250268709523,0.23686583825799373
 sentiment_polarity,mean_difference,reddit,anthropic,neutral,0.009573220321555345,,,continuous,-0.061133866133866135,-0.05156064581231079,0.01975901678199046
@@ -825,6 +849,7 @@ author_political_leaning,center-right,reddit,gemini,general,0.002581182125213426
 author_political_leaning,left,reddit,gemini,general,-0.024461239003102597,0.968236339404709,0.9437751004016064,categorical,,,
 author_is_minority,no,reddit,gemini,general,0.019903246928183682,0.7853176366059529,0.8052208835341366,categorical,,,
 author_is_minority,yes,reddit,gemini,general,-0.0077952859862372575,0.07807641048422923,0.07028112449799197,categorical,,,
+author_is_minority,unknown,reddit,gemini,general,-0.012107960941946383,0.13660595290981786,0.12449799196787148,categorical,,,
 text_length,mean_difference,reddit,gemini,general,130.74635815585756,,,continuous,144.3088627276766,275.05522088353416,0.6446274809494809
 avg_word_length,mean_difference,reddit,gemini,general,0.20574431012168404,,,continuous,4.419632225372614,4.625376535494298,0.25101427580800645
 sentiment_polarity,mean_difference,reddit,gemini,general,0.008352511958094479,,,continuous,-0.061017070191026195,-0.052664558232931716,0.017267710378958103
@@ -859,6 +884,7 @@ author_political_leaning,center-right,reddit,gemini,popular,-0.00181921447859517
 author_political_leaning,left,reddit,gemini,popular,0.017369828845238744,0.9641116526362428,0.9814814814814815,categorical,,,
 author_is_minority,no,reddit,gemini,popular,-0.002570421058581296,0.7875498449268941,0.7849794238683128,categorical,,,
 author_is_minority,yes,reddit,gemini,popular,0.0055433393320460655,0.07676118741692513,0.0823045267489712,categorical,,,
+author_is_minority,unknown,reddit,gemini,popular,-0.002972918273464714,0.13568896765618077,0.13271604938271606,categorical,,,
 text_length,mean_difference,reddit,gemini,popular,24.137381461607333,,,continuous,154.98504652193176,179.1224279835391,0.10908060619902263
 avg_word_length,mean_difference,reddit,gemini,popular,0.1171072195430991,,,continuous,4.4287415369211445,4.545848756464244,0.1444583314393289
 sentiment_polarity,mean_difference,reddit,gemini,popular,-0.09624609181130128,,,continuous,-0.050830039875941514,-0.1470761316872428,-0.19743095680217276
@@ -893,6 +919,7 @@ author_political_leaning,center-right,reddit,gemini,engaging,-0.0017647812778634
 author_political_leaning,left,reddit,gemini,engaging,0.022687787334733978,0.9636423914244668,0.9863301787592008,categorical,,,
 author_is_minority,no,reddit,gemini,engaging,0.013105072639336357,0.7860537075919991,0.7991587802313355,categorical,,,
 author_is_minority,yes,reddit,gemini,engaging,0.011025031494030807,0.07625151950491767,0.08727655099894847,categorical,,,
+author_is_minority,unknown,reddit,gemini,engaging,-0.024130104133367122,0.1376947729030832,0.11356466876971609,categorical,,,
 text_length,mean_difference,reddit,gemini,engaging,47.975775771099734,,,continuous,152.7687037241684,200.74447949526814,0.21623151819959513
 avg_word_length,mean_difference,reddit,gemini,engaging,0.10423021881238625,,,continuous,4.430212064851675,4.534442283664061,0.12627747629296954
 sentiment_polarity,mean_difference,reddit,gemini,engaging,-0.12041278339834333,,,continuous,-0.04873390429881755,-0.16914668769716087,-0.24749413981078236
@@ -927,6 +954,7 @@ author_political_leaning,center-right,reddit,gemini,informative,0.00034659125660
 author_political_leaning,left,reddit,gemini,informative,-0.03219989859615502,0.9690103298900367,0.9368104312938816,categorical,,,
 author_is_minority,no,reddit,gemini,informative,0.0691421147815322,0.7804065311562812,0.8495486459378134,categorical,,,
 author_is_minority,yes,reddit,gemini,informative,-0.022357531329966797,0.07952904587359769,0.05717151454363089,categorical,,,
+author_is_minority,unknown,reddit,gemini,informative,-0.04678458345156539,0.14006442297012106,0.09327983951855567,categorical,,,
 text_length,mean_difference,reddit,gemini,informative,255.04458905985982,,,continuous,131.90325447073198,386.9478435305918,1.580097400830668
 avg_word_length,mean_difference,reddit,gemini,informative,0.28233256650577054,,,continuous,4.411975801780109,4.6943083682858795,0.3426489095526665
 sentiment_polarity,mean_difference,reddit,gemini,informative,0.030276884769603718,,,continuous,-0.06320376541152949,-0.03292688064192577,0.06297364273555683
@@ -961,6 +989,7 @@ author_political_leaning,center-right,reddit,gemini,controversial,-0.00187422558
 author_political_leaning,left,reddit,gemini,controversial,-0.01899605494392065,0.9676882078614257,0.9486921529175051,categorical,,,
 author_is_minority,no,reddit,gemini,controversial,0.04627342111742183,0.7827004219409283,0.8289738430583501,categorical,,,
 author_is_minority,yes,reddit,gemini,controversial,0.005768343125597916,0.07672662669331556,0.08249496981891348,categorical,,,
+author_is_minority,unknown,reddit,gemini,controversial,-0.052041764243019734,0.14057295136575615,0.08853118712273642,categorical,,,
 text_length,mean_difference,reddit,gemini,controversial,138.71680806580542,,,continuous,143.54274927825895,282.2595573440644,0.6773715793691638
 avg_word_length,mean_difference,reddit,gemini,controversial,0.17943685760856276,,,continuous,4.422288335014443,4.601725192623006,0.2154307340619257
 sentiment_polarity,mean_difference,reddit,gemini,controversial,-0.08428971671467848,,,continuous,-0.05180676215856096,-0.13609647887323945,-0.17522144498189665
@@ -995,6 +1024,7 @@ author_political_leaning,center-right,reddit,gemini,neutral,-0.00188157497038488
 author_political_leaning,left,reddit,gemini,neutral,0.01459159217071404,0.9643452182605798,0.9789368104312939,categorical,,,
 author_is_minority,no,reddit,gemini,neutral,0.036833704490122576,0.7836276796623348,0.8204613841524574,categorical,,,
 author_is_minority,yes,reddit,gemini,neutral,0.0010382140534677536,0.07719649005886926,0.07823470411233702,categorical,,,
+author_is_minority,unknown,reddit,gemini,neutral,-0.037871918543590344,0.13917583027879596,0.10130391173520562,categorical,,,
 text_length,mean_difference,reddit,gemini,neutral,122.96780778857732,,,continuous,145.07130956347885,268.03911735205617,0.5682836420168391
 avg_word_length,mean_difference,reddit,gemini,neutral,0.1972980412704679,,,continuous,4.420453743946068,4.6177517852165355,0.2379711899160596
 sentiment_polarity,mean_difference,reddit,gemini,neutral,-0.08652603983225918,,,continuous,-0.051558513828723763,-0.13808455366098293,-0.17967175836935603
@@ -1029,6 +1059,7 @@ author_political_leaning,center-right,reddit,openai,general,-0.00188888888888888
 author_political_leaning,left,reddit,openai,general,-0.008666666666666711,0.9666666666666667,0.958,categorical,,,
 author_is_minority,no,reddit,openai,general,0.0441111111111111,0.7828888888888889,0.827,categorical,,,
 author_is_minority,yes,reddit,openai,general,-0.009222222222222215,0.07822222222222222,0.069,categorical,,,
+author_is_minority,unknown,reddit,openai,general,-0.0348888888888889,0.1388888888888889,0.104,categorical,,,
 text_length,mean_difference,reddit,openai,general,74.59533333333334,,,continuous,149.87166666666667,224.467,0.35888419372881253
 avg_word_length,mean_difference,reddit,openai,general,0.08597558894776913,,,continuous,4.431526799765956,4.517502388713726,0.10479349067216603
 sentiment_polarity,mean_difference,reddit,openai,general,-0.00040659999999998614,,,continuous,-0.060144500000000004,-0.06055109999999999,-0.0008364318063810242
@@ -1063,6 +1094,7 @@ author_political_leaning,center-right,reddit,openai,popular,-0.003,0.004,0.001,c
 author_political_leaning,left,reddit,openai,popular,0.0024444444444444713,0.9655555555555555,0.968,categorical,,,
 author_is_minority,no,reddit,openai,popular,0.006333333333333413,0.7866666666666666,0.793,categorical,,,
 author_is_minority,yes,reddit,openai,popular,0.004111111111111107,0.0768888888888889,0.081,categorical,,,
+author_is_minority,unknown,reddit,openai,popular,-0.01044444444444445,0.13644444444444445,0.126,categorical,,,
 text_length,mean_difference,reddit,openai,popular,45.638666666666666,,,continuous,152.76733333333334,198.406,0.21607112023810815
 avg_word_length,mean_difference,reddit,openai,popular,0.06742463278285271,,,continuous,4.433381895382449,4.500806528165302,0.08249751774888502
 sentiment_polarity,mean_difference,reddit,openai,popular,-0.01601226666666667,,,continuous,-0.05858393333333333,-0.0745962,-0.03287627258043528
@@ -1097,6 +1129,7 @@ author_political_leaning,center-right,reddit,openai,engaging,-0.0018888888888888
 author_political_leaning,left,reddit,openai,engaging,0.0024444444444444713,0.9655555555555555,0.968,categorical,,,
 author_is_minority,no,reddit,openai,engaging,0.02966666666666662,0.7843333333333333,0.814,categorical,,,
 author_is_minority,yes,reddit,openai,engaging,-0.005888888888888888,0.07788888888888888,0.072,categorical,,,
+author_is_minority,unknown,reddit,openai,engaging,-0.023777777777777773,0.13777777777777778,0.114,categorical,,,
 text_length,mean_difference,reddit,openai,engaging,33.93755555555555,,,continuous,153.93744444444445,187.875,0.15346688967295988
 avg_word_length,mean_difference,reddit,openai,engaging,0.07911206141725202,,,continuous,4.432213152519008,4.51132521393626,0.09709002738934173
 sentiment_polarity,mean_difference,reddit,openai,engaging,-0.045271822222222216,,,continuous,-0.055657977777777784,-0.1009298,-0.09275222022755865
@@ -1131,6 +1164,7 @@ author_political_leaning,center-right,reddit,openai,informative,-0.0018888888888
 author_political_leaning,left,reddit,openai,informative,-0.019777777777777783,0.9677777777777777,0.948,categorical,,,
 author_is_minority,no,reddit,openai,informative,0.03633333333333333,0.7836666666666666,0.82,categorical,,,
 author_is_minority,yes,reddit,openai,informative,-0.012555555555555556,0.07855555555555556,0.066,categorical,,,
+author_is_minority,unknown,reddit,openai,informative,-0.023777777777777773,0.13777777777777778,0.114,categorical,,,
 text_length,mean_difference,reddit,openai,informative,155.5208888888889,,,continuous,141.77911111111112,297.3,0.8846182999276005
 avg_word_length,mean_difference,reddit,openai,informative,0.18081279644466708,,,continuous,4.422043079016267,4.602855875460934,0.22006316475813778
 sentiment_polarity,mean_difference,reddit,openai,informative,0.01693440000000001,,,continuous,-0.061878600000000006,-0.0449442,0.03510861035307596
@@ -1165,6 +1199,7 @@ author_political_leaning,center-right,reddit,openai,controversial,-0.00188888888
 author_political_leaning,left,reddit,openai,controversial,-0.013111111111111184,0.9671111111111111,0.954,categorical,,,
 author_is_minority,no,reddit,openai,controversial,0.04299999999999993,0.783,0.826,categorical,,,
 author_is_minority,yes,reddit,openai,controversial,0.0018888888888888844,0.07711111111111112,0.079,categorical,,,
+author_is_minority,unknown,reddit,openai,controversial,-0.044888888888888895,0.1398888888888889,0.095,categorical,,,
 text_length,mean_difference,reddit,openai,controversial,94.97311111111111,,,continuous,147.83388888888888,242.807,0.4804339889011307
 avg_word_length,mean_difference,reddit,openai,controversial,0.11049971132650072,,,continuous,4.429074387528083,4.539574098854584,0.13380388385165268
 sentiment_polarity,mean_difference,reddit,openai,controversial,-0.03758104444444445,,,continuous,-0.05642705555555555,-0.0940081,-0.07751049596167782
@@ -1199,6 +1234,7 @@ author_political_leaning,center-right,reddit,openai,neutral,-0.00188888888888888
 author_political_leaning,left,reddit,openai,neutral,0.0013333333333332975,0.9656666666666667,0.967,categorical,,,
 author_is_minority,no,reddit,openai,neutral,0.03411111111111109,0.7838888888888889,0.818,categorical,,,
 author_is_minority,yes,reddit,openai,neutral,0.004111111111111107,0.0768888888888889,0.081,categorical,,,
+author_is_minority,unknown,reddit,openai,neutral,-0.03822222222222221,0.13922222222222222,0.101,categorical,,,
 text_length,mean_difference,reddit,openai,neutral,79.98866666666666,,,continuous,149.33233333333334,229.321,0.36978895508919024
 avg_word_length,mean_difference,reddit,openai,neutral,0.11624778118502199,,,continuous,4.428499580542232,4.544747361727254,0.14139477538843148
 sentiment_polarity,mean_difference,reddit,openai,neutral,-0.040469599999999994,,,continuous,-0.0561382,-0.0966078,-0.08377840731741339
@@ -1235,6 +1271,7 @@ author_political_leaning,unknown,twitter,anthropic,general,0.044950245605192785,
 author_is_minority,no,twitter,anthropic,general,0.03284350441082218,0.856825502610241,0.8896690070210632,categorical,,,
 author_is_minority,unknown,twitter,anthropic,general,-0.0008819081926441327,0.00288792624680662,0.0020060180541624875,categorical,,,
 author_is_minority,yes,twitter,anthropic,general,-0.020231192299546646,0.1155170498722648,0.09528585757271815,categorical,,,
+author_is_minority,unknown,twitter,anthropic,general,-0.01173040391863138,0.024769521270687548,0.013039117352056168,categorical,,,
 text_length,mean_difference,twitter,anthropic,general,68.84483451465137,,,continuous,72.65666999888926,141.50150451354062,0.878228487998279
 avg_word_length,mean_difference,twitter,anthropic,general,0.20655037315154967,,,continuous,4.175812149311864,4.3823625224634135,0.14747862559296215
 sentiment_polarity,mean_difference,twitter,anthropic,general,0.07307676265495364,,,continuous,0.08033637676330113,0.15341313941825477,0.15972380891152002
@@ -1270,6 +1307,7 @@ author_political_leaning,unknown,twitter,anthropic,popular,0.06233219109566182,0
 author_is_minority,no,twitter,anthropic,popular,0.011966304711555242,0.8589045661593157,0.8708708708708709,categorical,,,
 author_is_minority,unknown,twitter,anthropic,popular,0.0035618331363248593,0.0024441728696811466,0.006006006006006006,categorical,,,
 author_is_minority,yes,twitter,anthropic,popular,-0.007102425167084647,0.11420953227419176,0.10710710710710711,categorical,,,
+author_is_minority,unknown,twitter,anthropic,popular,-0.00842571268079545,0.024441728696811466,0.016016016016016016,categorical,,,
 text_length,mean_difference,twitter,anthropic,popular,6.0053615441905634,,,continuous,78.92056438173536,84.92592592592592,0.07284221486550727
 avg_word_length,mean_difference,twitter,anthropic,popular,0.0306450571035084,,,continuous,4.193343780310433,4.223988837413941,0.022262738601193505
 sentiment_polarity,mean_difference,twitter,anthropic,popular,0.07048309517160757,,,continuous,0.08058086879235639,0.15106396396396396,0.15293768493133975
@@ -1305,6 +1343,7 @@ author_political_leaning,unknown,twitter,anthropic,engaging,-0.09926066096723263
 author_is_minority,no,twitter,anthropic,engaging,0.009381972084674839,0.8591721229608257,0.8685540950455005,categorical,,,
 author_is_minority,unknown,twitter,anthropic,engaging,-0.0019852154635402928,0.002996337809344135,0.0010111223458038423,categorical,,,
 author_is_minority,yes,twitter,anthropic,engaging,0.0030840858588856435,0.11319498390855622,0.11627906976744186,categorical,,,
+author_is_minority,unknown,twitter,anthropic,engaging,-0.010480842480020207,0.024636555321273998,0.014155712841253791,categorical,,,
 text_length,mean_difference,twitter,anthropic,engaging,71.1188128788553,,,continuous,72.48684940628121,143.6056622851365,0.9148742148438567
 avg_word_length,mean_difference,twitter,anthropic,engaging,0.2465145749385691,,,continuous,4.172024930053648,4.418539504992217,0.1758960344243266
 sentiment_polarity,mean_difference,twitter,anthropic,engaging,-0.2260336866894176,,,continuous,0.1099768616135834,-0.11605682507583419,-0.5068618652347111
@@ -1340,6 +1379,7 @@ author_political_leaning,unknown,twitter,anthropic,informative,-0.00596460679507
 author_is_minority,no,twitter,anthropic,informative,0.012602629692124445,0.8588548601864181,0.8714574898785425,categorical,,,
 author_is_minority,unknown,twitter,anthropic,informative,-0.0031069684864624943,0.0031069684864624943,0.0,categorical,,,
 author_is_minority,yes,twitter,anthropic,informative,-0.00015498902947216897,0.11351531291611185,0.11336032388663968,categorical,,,
+author_is_minority,unknown,twitter,anthropic,informative,-0.009340672176189732,0.024522858411007546,0.015182186234817813,categorical,,,
 text_length,mean_difference,twitter,anthropic,informative,96.57023428950332,,,continuous,69.97936085219708,166.5495951417004,1.2776149162125052
 avg_word_length,mean_difference,twitter,anthropic,informative,0.2972845864040483,,,continuous,4.167033504378352,4.464318090782401,0.21245052049194624
 sentiment_polarity,mean_difference,twitter,anthropic,informative,0.03853806211600905,,,continuous,0.0838145694629383,0.12235263157894735,0.08421528599844685
@@ -1375,6 +1415,7 @@ author_political_leaning,unknown,twitter,anthropic,controversial,-0.120111111111
 author_is_minority,no,twitter,anthropic,controversial,-0.0023333333333332984,0.8603333333333333,0.858,categorical,,,
 author_is_minority,unknown,twitter,anthropic,controversial,-0.002,0.003,0.001,categorical,,,
 author_is_minority,yes,twitter,anthropic,controversial,0.017222222222222222,0.11177777777777778,0.129,categorical,,,
+author_is_minority,unknown,twitter,anthropic,controversial,-0.012888888888888887,0.024888888888888887,0.012,categorical,,,
 text_length,mean_difference,twitter,anthropic,controversial,112.33944444444445,,,continuous,68.28655555555555,180.626,1.5314162666046225
 avg_word_length,mean_difference,twitter,anthropic,controversial,0.3324867398968525,,,continuous,4.1631565475253876,4.49564328742224,0.23657358849795623
 sentiment_polarity,mean_difference,twitter,anthropic,controversial,-0.11580958888888888,,,continuous,0.09920308888888889,-0.0166065,-0.25533737782722477
@@ -1410,6 +1451,7 @@ author_political_leaning,unknown,twitter,anthropic,neutral,-0.026635790328713327
 author_is_minority,no,twitter,anthropic,neutral,0.008630005408141184,0.8592378624597267,0.8678678678678678,categorical,,,
 author_is_minority,unknown,twitter,anthropic,neutral,-0.001998665702698588,0.002999666703699589,0.001001001001001001,categorical,,,
 author_is_minority,yes,twitter,anthropic,neutral,0.004018572510962243,0.11309854460615487,0.11711711711711711,categorical,,,
+author_is_minority,unknown,twitter,anthropic,neutral,-0.010649912216404829,0.024663926230418843,0.014014014014014014,categorical,,,
 text_length,mean_difference,twitter,anthropic,neutral,115.91195739679243,,,continuous,67.94089545606043,183.85285285285286,1.5896036922008536
 avg_word_length,mean_difference,twitter,anthropic,neutral,0.31843663704489966,,,continuous,4.164593401474287,4.483030038519186,0.22698216331177734
 sentiment_polarity,mean_difference,twitter,anthropic,neutral,-0.00970597068571738,,,continuous,0.08859175647150316,0.07888578578578578,-0.02147233443887258
@@ -1445,6 +1487,7 @@ author_political_leaning,unknown,twitter,gemini,general,0.029867150603751058,0.1
 author_is_minority,no,twitter,gemini,general,0.013252042914099538,0.8588052754072925,0.872057318321392,categorical,,,
 author_is_minority,unknown,twitter,gemini,general,-0.0019688114225547334,0.0029923528759835975,0.0010235414534288639,categorical,,,
 author_is_minority,yes,twitter,gemini,general,-0.016890192254049738,0.11515017178322066,0.09825997952917093,categorical,,,
+author_is_minority,unknown,twitter,gemini,general,0.005606960762504918,0.02305219993350327,0.028659160696008188,categorical,,,
 text_length,mean_difference,twitter,gemini,general,11.510980525033773,,,continuous,78.3958772027042,89.90685772773797,0.14144155888811363
 avg_word_length,mean_difference,twitter,gemini,general,0.17657060078955666,,,continuous,4.179154273817933,4.35572487460749,0.13036063919707847
 sentiment_polarity,mean_difference,twitter,gemini,general,0.1018228963489302,,,continuous,0.07767403302670951,0.1794969293756397,0.22014273590878602
@@ -1480,6 +1523,7 @@ author_political_leaning,unknown,twitter,gemini,popular,0.0030575375113190417,0.
 author_is_minority,no,twitter,gemini,popular,0.01157003341877294,0.8590182018753447,0.8705882352941177,categorical,,,
 author_is_minority,unknown,twitter,gemini,popular,0.003990195586834243,0.0024269167126309984,0.006417112299465241,categorical,,,
 author_is_minority,yes,twitter,gemini,popular,-0.009583194457144034,0.11439602868174296,0.10481283422459893,categorical,,,
+author_is_minority,unknown,twitter,gemini,popular,-0.005977034548463121,0.024158852730281302,0.01818181818181818,categorical,,,
 text_length,mean_difference,twitter,gemini,popular,-11.409773737504835,,,continuous,80.5873138444567,69.17754010695187,-0.1391942283030273
 avg_word_length,mean_difference,twitter,gemini,popular,-0.19602391250792284,,,continuous,4.214733457334563,4.01870954482664,-0.14979077005668104
 sentiment_polarity,mean_difference,twitter,gemini,popular,0.0636369045308541,,,continuous,0.08167207942636515,0.14530898395721925,0.13801431414819504
@@ -1515,6 +1559,7 @@ author_political_leaning,unknown,twitter,gemini,engaging,-0.07376070285161196,0.
 author_is_minority,no,twitter,gemini,engaging,0.018354552900007537,0.8584022038567493,0.8767567567567568,categorical,,,
 author_is_minority,unknown,twitter,gemini,engaging,-0.000702851611942521,0.002865013774104683,0.002162162162162162,categorical,,,
 author_is_minority,yes,twitter,gemini,engaging,-0.01070657434293798,0.11449035812672176,0.10378378378378378,categorical,,,
+author_is_minority,unknown,twitter,gemini,engaging,-0.006945126945126945,0.024242424242424242,0.017297297297297298,categorical,,,
 text_length,mean_difference,twitter,gemini,engaging,52.26659221204676,,,continuous,74.68584022038567,126.95243243243243,0.6676042859052185
 avg_word_length,mean_difference,twitter,gemini,engaging,0.16270530281672357,,,continuous,4.181354981004526,4.34406028382125,0.11804445235549624
 sentiment_polarity,mean_difference,twitter,gemini,engaging,-0.19075115211078847,,,continuous,0.10526661157024793,-0.08548454054054054,-0.4208918771754869
@@ -1550,6 +1595,7 @@ author_political_leaning,unknown,twitter,gemini,informative,-0.03448363783521371
 author_is_minority,no,twitter,gemini,informative,0.007357753428558378,0.8593767328379727,0.866734486266531,categorical,,,
 author_is_minority,unknown,twitter,gemini,informative,-0.001977050018891636,0.002994344016857048,0.001017293997965412,categorical,,,
 author_is_minority,yes,twitter,gemini,informative,-0.004028222490557287,0.11389597427082178,0.10986775178026449,categorical,,,
+author_is_minority,unknown,twitter,gemini,informative,-0.001352480919109389,0.02373294887434845,0.022380467955239063,categorical,,,
 text_length,mean_difference,twitter,gemini,informative,101.42856473998306,,,continuous,69.55007208605967,170.97863682604273,1.3611196572179165
 avg_word_length,mean_difference,twitter,gemini,informative,0.3294634004738475,,,continuous,4.1640189692484935,4.493482369722341,0.23552109548400776
 sentiment_polarity,mean_difference,twitter,gemini,informative,0.04773649119426389,,,continuous,0.08292963291560386,0.13066612410986775,0.10414833645671874
@@ -1585,6 +1631,7 @@ author_political_leaning,unknown,twitter,gemini,controversial,-0.131557448005713
 author_is_minority,no,twitter,gemini,controversial,-0.004890132086768917,0.860581188997338,0.8556910569105691,categorical,,,
 author_is_minority,unknown,twitter,gemini,controversial,-0.0008512418753291347,0.002883762200532387,0.0020325203252032522,categorical,,,
 author_is_minority,yes,twitter,gemini,controversial,0.016136624320990334,0.11191215616681455,0.12804878048780488,categorical,,,
+author_is_minority,unknown,twitter,gemini,controversial,-0.010395250358892232,0.024622892635314995,0.014227642276422764,categorical,,,
 text_length,mean_difference,twitter,gemini,controversial,100.19092976533136,,,continuous,69.6617125110914,169.85264227642276,1.3550262115907405
 avg_word_length,mean_difference,twitter,gemini,controversial,0.3175051944442746,,,continuous,4.165162710381756,4.48266790482603,0.2281876387826642
 sentiment_polarity,mean_difference,twitter,gemini,controversial,-0.19624391316972178,,,continuous,0.10693253105590063,-0.08931138211382114,-0.43743928029189566
@@ -1620,6 +1667,7 @@ author_political_leaning,unknown,twitter,gemini,neutral,-0.11259397801059845,0.1
 author_is_minority,no,twitter,gemini,neutral,0.002339635274096419,0.8598690779984467,0.8622087132725431,categorical,,,
 author_is_minority,unknown,twitter,gemini,neutral,-0.001982501690960631,0.002995672916897814,0.0010131712259371835,categorical,,,
 author_is_minority,yes,twitter,gemini,neutral,0.0078413135321478,0.11272606235437702,0.12056737588652482,categorical,,,
+author_is_minority,unknown,twitter,gemini,neutral,-0.008198447115283551,0.024409186730278486,0.016210739614994935,categorical,,,
 text_length,mean_difference,twitter,gemini,neutral,111.61100801038148,,,continuous,68.50449350937535,180.11550151975683,1.5427780228697654
 avg_word_length,mean_difference,twitter,gemini,neutral,0.32126713098987647,,,continuous,4.1646961556863715,4.485963286676248,0.2305182339967319
 sentiment_polarity,mean_difference,twitter,gemini,neutral,-0.2580174267137044,,,continuous,0.11308845001664262,-0.14492897669706178,-0.5815971644132454
@@ -1655,6 +1703,7 @@ author_political_leaning,unknown,twitter,openai,general,-0.005666666666666681,0.
 author_is_minority,no,twitter,openai,general,0.02100000000000002,0.858,0.879,categorical,,,
 author_is_minority,unknown,twitter,openai,general,0.0035555555555555557,0.0024444444444444444,0.006,categorical,,,
 author_is_minority,yes,twitter,openai,general,-0.019444444444444445,0.11544444444444445,0.096,categorical,,,
+author_is_minority,unknown,twitter,openai,general,-0.005111111111111111,0.02411111111111111,0.019,categorical,,,
 text_length,mean_difference,twitter,openai,general,32.58944444444444,,,continuous,76.26155555555556,108.851,0.40798411280369473
 avg_word_length,mean_difference,twitter,openai,general,0.09464016631087713,,,continuous,4.1869412048839845,4.281581371194862,0.06938081472602074
 sentiment_polarity,mean_difference,twitter,openai,general,0.02963918888888889,,,continuous,0.0846582111111111,0.1142974,0.06458883597095638
@@ -1690,6 +1739,7 @@ author_political_leaning,unknown,twitter,openai,popular,-0.015666666666666662,0.
 author_is_minority,no,twitter,openai,popular,-0.0012222222222222356,0.8602222222222222,0.859,categorical,,,
 author_is_minority,unknown,twitter,openai,popular,0.0057777777777777775,0.0022222222222222222,0.008,categorical,,,
 author_is_minority,yes,twitter,openai,popular,-0.006111111111111109,0.11411111111111111,0.108,categorical,,,
+author_is_minority,unknown,twitter,openai,popular,0.0015555555555555566,0.023444444444444445,0.025,categorical,,,
 text_length,mean_difference,twitter,openai,popular,12.987222222222229,,,continuous,78.22177777777777,91.209,0.15993558244716552
 avg_word_length,mean_difference,twitter,openai,popular,-0.03184234268944586,,,continuous,4.199589455784017,4.167747113094571,-0.02365835516352928
 sentiment_polarity,mean_difference,twitter,openai,popular,0.048733966666666684,,,continuous,0.08274873333333332,0.1314827,0.10622939168926125
@@ -1725,6 +1775,7 @@ author_political_leaning,unknown,twitter,openai,engaging,-0.04122222222222223,0.
 author_is_minority,no,twitter,openai,engaging,-0.005666666666666709,0.8606666666666667,0.855,categorical,,,
 author_is_minority,unknown,twitter,openai,engaging,0.0035555555555555557,0.0024444444444444444,0.006,categorical,,,
 author_is_minority,yes,twitter,openai,engaging,-0.0005555555555555591,0.11355555555555556,0.113,categorical,,,
+author_is_minority,unknown,twitter,openai,engaging,0.0026666666666666644,0.023333333333333334,0.026,categorical,,,
 text_length,mean_difference,twitter,openai,engaging,31.37722222222223,,,continuous,76.38277777777778,107.76,0.3917729845238484
 avg_word_length,mean_difference,twitter,openai,engaging,0.0620480049148151,,,continuous,4.190200421023592,4.252248425938407,0.045369364388591626
 sentiment_polarity,mean_difference,twitter,openai,engaging,-0.03522525555555557,,,continuous,0.09114465555555556,0.055919399999999994,-0.07727244183249773
@@ -1760,6 +1811,7 @@ author_political_leaning,unknown,twitter,openai,informative,-0.04096373150655899
 author_is_minority,no,twitter,openai,informative,-0.0015358421798050692,0.8602532770495446,0.8587174348697395,categorical,,,
 author_is_minority,unknown,twitter,openai,informative,-0.0019973294734325353,0.002999333481448567,0.001002004008016032,categorical,,,
 author_is_minority,yes,twitter,openai,informative,0.009713940211015223,0.11253054876694069,0.12224448897795591,categorical,,,
+author_is_minority,unknown,twitter,openai,informative,-0.006180768557777629,0.024216840702066207,0.018036072144288578,categorical,,,
 text_length,mean_difference,twitter,openai,informative,79.48416383978801,,,continuous,71.58798044878915,151.07214428857716,1.0575818335624274
 avg_word_length,mean_difference,twitter,openai,informative,0.3013048805821983,,,continuous,4.166334994432969,4.467639875015167,0.21795932455275038
 sentiment_polarity,mean_difference,twitter,openai,informative,-0.01996938304513937,,,continuous,0.08961507442790491,0.06964569138276554,-0.04367070991172745
@@ -1795,6 +1847,7 @@ author_political_leaning,unknown,twitter,openai,controversial,-0.097888888888888
 author_is_minority,no,twitter,openai,controversial,0.014333333333333309,0.8586666666666667,0.873,categorical,,,
 author_is_minority,unknown,twitter,openai,controversial,-0.0008888888888888887,0.0028888888888888888,0.002,categorical,,,
 author_is_minority,yes,twitter,openai,controversial,-0.003888888888888886,0.11388888888888889,0.11,categorical,,,
+author_is_minority,unknown,twitter,openai,controversial,-0.009555555555555557,0.024555555555555556,0.015,categorical,,,
 text_length,mean_difference,twitter,openai,controversial,79.235,,,continuous,71.597,150.832,1.047897979423891
 avg_word_length,mean_difference,twitter,openai,controversial,0.23406773956979432,,,continuous,4.172998447558094,4.407066187127889,0.168430312476239
 sentiment_polarity,mean_difference,twitter,openai,controversial,-0.1649278111111111,,,continuous,0.10411491111111111,-0.060812899999999996,-0.36490650682676123
@@ -1830,6 +1883,7 @@ author_political_leaning,unknown,twitter,openai,neutral,-0.08112867895114312,0.1
 author_is_minority,no,twitter,openai,neutral,0.02753570146082096,0.857349183424064,0.8848848848848849,categorical,,,
 author_is_minority,unknown,twitter,openai,neutral,-0.0008865659348938986,0.0028885679368959006,0.002002002002002002,categorical,,,
 author_is_minority,yes,twitter,openai,neutral,-0.02267182191635031,0.1157649150094434,0.09309309309309309,categorical,,,
+author_is_minority,unknown,twitter,openai,neutral,-0.003977313609576691,0.02399733362959671,0.02002002002002002,categorical,,,
 text_length,mean_difference,twitter,openai,neutral,76.96511142850439,,,continuous,71.83168536829241,148.7967967967968,1.0118994647386494
 avg_word_length,mean_difference,twitter,openai,neutral,0.23724836462288756,,,continuous,4.172704109889247,4.409952474512134,0.17087170197468685
 sentiment_polarity,mean_difference,twitter,openai,neutral,-0.1881111284265045,,,continuous,0.1064144317298078,-0.08169669669669669,-0.4196985603258754

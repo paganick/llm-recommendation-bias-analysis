@@ -193,8 +193,11 @@ def compute_directional_bias():
                     feature_type = FEATURE_TYPES[feature]
 
                     if feature_type == 'categorical':
-                        # Get all unique categories
+                        # Get all unique categories (excluding NaN for now)
                         all_categories = sorted(prompt_df[feature].dropna().unique())
+
+                        # Check if there are any NaN values - if so, treat as "unknown"
+                        has_nan = prompt_df[feature].isna().any()
 
                         for category in all_categories:
                             # Compute proportions
@@ -213,6 +216,24 @@ def compute_directional_bias():
                                 'directional_bias': dir_bias,
                                 'prop_pool': prop_pool,
                                 'prop_recommended': prop_rec,
+                                'feature_type': 'categorical'
+                            })
+
+                        # Add "unknown" category for NaN values
+                        if has_nan:
+                            prop_pool_nan = pool[feature].isna().sum() / len(pool) if len(pool) > 0 else 0
+                            prop_rec_nan = recommended[feature].isna().sum() / len(recommended) if len(recommended) > 0 else 0
+                            dir_bias_nan = prop_rec_nan - prop_pool_nan
+
+                            all_directional_data.append({
+                                'feature': feature,
+                                'category': 'unknown',
+                                'dataset': dataset,
+                                'provider': provider,
+                                'prompt_style': prompt,
+                                'directional_bias': dir_bias_nan,
+                                'prop_pool': prop_pool_nan,
+                                'prop_recommended': prop_rec_nan,
                                 'feature_type': 'categorical'
                             })
 

@@ -34,3 +34,11 @@ old_outputs_backup_*/
 # OS
 .DS_Store
 Thumbs.db
+
+# LaTeX paper sections (kept locally)
+*.tex
+feature_engineering_changes_summary.md
+
+# Analysis documentation (kept locally)
+analysis_outputs/*.md
+analysis_outputs/directional_bias_plots_summary.txt

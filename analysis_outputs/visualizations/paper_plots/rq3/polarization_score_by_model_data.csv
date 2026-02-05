@@ -1,0 +1,55 @@
+provider,provider_display,dataset,dataset_display,prompt_style,prompt_display,directional_bias
+anthropic,Anthropic Claude Sonnet 4.5,bluesky,Bluesky,controversial,Controversial,0.0950788324894905
+anthropic,Anthropic Claude Sonnet 4.5,reddit,Reddit,controversial,Controversial,0.0982884379437984
+anthropic,Anthropic Claude Sonnet 4.5,twitter,Twitter/X,controversial,Controversial,0.1144092592592592
+gemini,Google Gemini 2.0 Flash,bluesky,Bluesky,controversial,Controversial,0.0552862874639878
+gemini,Google Gemini 2.0 Flash,reddit,Reddit,controversial,Controversial,0.0965712254130304
+gemini,Google Gemini 2.0 Flash,twitter,Twitter/X,controversial,Controversial,0.1307645636904461
+openai,OpenAI GPT-4o-mini,bluesky,Bluesky,controversial,Controversial,0.0555259259259259
+openai,OpenAI GPT-4o-mini,reddit,Reddit,controversial,Controversial,0.0715592592592592
+openai,OpenAI GPT-4o-mini,twitter,Twitter/X,controversial,Controversial,0.1057055555555555
+anthropic,Anthropic Claude Sonnet 4.5,bluesky,Bluesky,engaging,Engaging,0.0494778462711373
+anthropic,Anthropic Claude Sonnet 4.5,reddit,Reddit,engaging,Engaging,0.0721586564871803
+anthropic,Anthropic Claude Sonnet 4.5,twitter,Twitter/X,engaging,Engaging,0.0994502936286874
+gemini,Google Gemini 2.0 Flash,bluesky,Bluesky,engaging,Engaging,0.0383460541623895
+gemini,Google Gemini 2.0 Flash,reddit,Reddit,engaging,Engaging,0.0683890259508179
+gemini,Google Gemini 2.0 Flash,twitter,Twitter/X,engaging,Engaging,0.0724883726701908
+openai,OpenAI GPT-4o-mini,bluesky,Bluesky,engaging,Engaging,0.0457757427834826
+openai,OpenAI GPT-4o-mini,reddit,Reddit,engaging,Engaging,0.0464111111111111
+openai,OpenAI GPT-4o-mini,twitter,Twitter/X,engaging,Engaging,0.0460203703703703
+anthropic,Anthropic Claude Sonnet 4.5,bluesky,Bluesky,general,General,0.01684638127051
+anthropic,Anthropic Claude Sonnet 4.5,reddit,Reddit,general,General,0.0577434454917015
+anthropic,Anthropic Claude Sonnet 4.5,twitter,Twitter/X,general,General,0.0083269301406385
+gemini,Google Gemini 2.0 Flash,bluesky,Bluesky,general,General,-0.0007838005500387
+gemini,Google Gemini 2.0 Flash,reddit,Reddit,general,General,0.0507931920187785
+gemini,Google Gemini 2.0 Flash,twitter,Twitter/X,general,General,-0.0034191271988378
+openai,OpenAI GPT-4o-mini,bluesky,Bluesky,general,General,0.0383592592592592
+openai,OpenAI GPT-4o-mini,reddit,Reddit,general,General,0.0693555555555555
+openai,OpenAI GPT-4o-mini,twitter,Twitter/X,general,General,0.0354833333333333
+anthropic,Anthropic Claude Sonnet 4.5,bluesky,Bluesky,informative,Informative,-0.0219608471829647
+anthropic,Anthropic Claude Sonnet 4.5,reddit,Reddit,informative,Informative,0.0678126871108995
+anthropic,Anthropic Claude Sonnet 4.5,twitter,Twitter/X,informative,Informative,0.0257101866876553
+gemini,Google Gemini 2.0 Flash,bluesky,Bluesky,informative,Informative,-0.0238121386127379
+gemini,Google Gemini 2.0 Flash,reddit,Reddit,informative,Informative,0.0623999140224925
+gemini,Google Gemini 2.0 Flash,twitter,Twitter/X,informative,Informative,0.0434814736927531
+openai,OpenAI GPT-4o-mini,bluesky,Bluesky,informative,Informative,-0.0002333333333333
+openai,OpenAI GPT-4o-mini,reddit,Reddit,informative,Informative,0.0661888888888889
+openai,OpenAI GPT-4o-mini,twitter,Twitter/X,informative,Informative,0.058264158473208
+anthropic,Anthropic Claude Sonnet 4.5,bluesky,Bluesky,neutral,Neutral,0.0530623801943479
+anthropic,Anthropic Claude Sonnet 4.5,reddit,Reddit,neutral,Neutral,0.0955134710936931
+anthropic,Anthropic Claude Sonnet 4.5,twitter,Twitter/X,neutral,Neutral,0.0843691690060612
+gemini,Google Gemini 2.0 Flash,bluesky,Bluesky,neutral,Neutral,0.0343577416577736
+gemini,Google Gemini 2.0 Flash,reddit,Reddit,neutral,Neutral,0.1012071424759672
+gemini,Google Gemini 2.0 Flash,twitter,Twitter/X,neutral,Neutral,0.1284179015990749
+openai,OpenAI GPT-4o-mini,bluesky,Bluesky,neutral,Neutral,0.0510814814814814
+openai,OpenAI GPT-4o-mini,reddit,Reddit,neutral,Neutral,0.0944666666666666
+openai,OpenAI GPT-4o-mini,twitter,Twitter/X,neutral,Neutral,0.1020700903102858
+anthropic,Anthropic Claude Sonnet 4.5,bluesky,Bluesky,popular,Popular,0.0131214116948101
+anthropic,Anthropic Claude Sonnet 4.5,reddit,Reddit,popular,Popular,0.0219071607812693
+anthropic,Anthropic Claude Sonnet 4.5,twitter,Twitter/X,popular,Popular,-0.0105300111799389
+gemini,Google Gemini 2.0 Flash,bluesky,Bluesky,popular,Popular,0.0103331057781908
+gemini,Google Gemini 2.0 Flash,reddit,Reddit,popular,Popular,0.0407839229636436
+gemini,Google Gemini 2.0 Flash,twitter,Twitter/X,popular,Popular,-0.0045006995427163
+openai,OpenAI GPT-4o-mini,bluesky,Bluesky,popular,Popular,0.0383222222222222
+openai,OpenAI GPT-4o-mini,reddit,Reddit,popular,Popular,0.0516518518518518
+openai,OpenAI GPT-4o-mini,twitter,Twitter/X,popular,Popular,0.019224074074074

@@ -1,0 +1,17 @@
+feature,feature_display,category,r_squared,significant
+text_length,Text: Length (chars),text_metrics,0.09126415190199352,0.9814814814814815
+polarization_score,Content: Polarization Score,content,0.04812491232403409,0.9074074074074074
+toxicity,Toxicity: Toxicity,toxicity,0.017091257202792306,0.7592592592592593
+primary_topic,Content: Primary Topic,content,0.013683129228735295,0.9444444444444444
+avg_word_length,Text: Avg Word Length,text_metrics,0.010222450957230992,0.8333333333333334
+controversy_level,Content: Controversy Level,content,0.009491481150631649,0.7777777777777778
+sentiment_polarity,Sentiment: Polarity,sentiment,0.008555560623171895,0.6111111111111112
+severe_toxicity,Toxicity: Severe Toxicity,toxicity,0.008448824404720836,0.7037037037037037
+sentiment_subjectivity,Sentiment: Subjectivity,sentiment,0.004941033099948934,0.6666666666666666
+author_political_leaning,Author: Political Leaning,author,0.004801102523524729,0.8888888888888888
+has_url,Style: Has URL,style,0.003813492088547071,0.46296296296296297
+author_gender,Author: Gender,author,0.0016435253677150317,0.7222222222222222
+has_emoji,Style: Has Emoji,style,0.0013716574392171235,0.5
+author_is_minority,Author: Is Minority,author,0.0013572418237680097,0.3888888888888889
+has_hashtag,Style: Has Hashtag,style,0.0006019109515371845,0.4074074074074074
+has_mention,Style: Has Mention,style,0.0003138348148580255,0.25925925925925924
